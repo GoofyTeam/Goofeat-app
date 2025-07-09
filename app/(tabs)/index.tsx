@@ -32,8 +32,7 @@ export default function HomeScreen() {
     setScanned(true);
 
     const code = result?.data;
-    
-    const apiURL = "http://192.168.21.176:3000/product/barcode";
+    const apiURL = "http://192.168.21.17:3000/product/barcode";
     try {
       const response = await fetch(`${apiURL}/${code}`, {
         method: 'GET',

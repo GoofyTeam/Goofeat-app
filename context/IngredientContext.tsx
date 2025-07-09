@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, ReactNode, useContext, useState } from 'react';
 
 export interface Ingredient {
   category: string | null;
@@ -17,6 +17,7 @@ export interface IngredientItem {
   name: string;
   ingredientId: string;
   ingredient: Ingredient;
+  occurrences: number;
 }
 
 interface IngredientContextType {
@@ -32,8 +33,27 @@ const IngredientContext = createContext<IngredientContextType | undefined>(undef
 export const IngredientProvider = ({ children }: { children: ReactNode }) => {
   const [ingredients, setIngredients] = useState<IngredientItem[]>([]);
 
+  const normalizeName = (name: string) => name.trim().toLowerCase();
+
   const addIngredient = (item: IngredientItem) => {
-    setIngredients((prev) => [...prev, item]);
+    const normalizedName = normalizeName(item.name);
+    const existingIndex = ingredients.findIndex(
+      (i) => normalizeName(i.name) === normalizedName
+    );
+
+    if (existingIndex === -1) {
+      // Si l'ingrédient n'existe pas, l'ajouter avec 1 occurrence
+      setIngredients((prev) => [...prev, { ...item, occurrences: 1 }]);
+    } else {
+      // Si l'ingrédient existe déjà, incrémenter les occurrences
+      setIngredients((prev) =>
+        prev.map((ingredient, index) =>
+          index === existingIndex
+            ? { ...ingredient, occurrences: ingredient.occurrences + 1 }
+            : ingredient
+        )
+      );
+    }
   };
 
   const updateIngredient = (id: string, updatedItem: Partial<IngredientItem>) => {

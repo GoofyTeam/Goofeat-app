@@ -1,28 +1,35 @@
-import React, { useState } from 'react';
-import { Alert, FlatList, Text, TextInput, View } from 'react-native';
+import { useIngredientContext } from '@/context/IngredientContext';
+import React, { useEffect, useState } from 'react';
+import { FlatList, Text, TextInput, View } from 'react-native';
 import ArticleCard from '../../components/ArticleCard';
 import Button from '../../components/Button';
 import Checkbox from '../../components/Checkbox';
 import Counter from '../../components/Counter';
-import { useIngredientContext } from '@/context/IngredientContext';
 
-const initialArticles = [
-  { id: '1', name: 'Sauce tomate', checked: false, quantity: 2, dlc: ['23/05/2027', '23/05/2027'] },
-  { id: '2', name: 'Yahourt', checked: false, quantity: 1, dlc: [''] },
-  { id: '3', name: 'Pain', checked: false, quantity: 1, dlc: [''] },
-  { id: '4', name: 'Steacks hachés', checked: false, quantity: 1, dlc: [''] },
-  { id: '5', name: 'Haricots verts', checked: false, quantity: 1, dlc: [''] },
-  { id: '6', name: 'Crème fraiche', checked: false, quantity: 1, dlc: [''] },
-];
+interface Article {
+  id: string;
+  name: string;
+  checked: boolean;
+  quantity: number;
+  dlc: string[];
+}
 
 export default function RecapList() {
-  const [articles, setArticles] = useState(initialArticles);
+  const { ingredients } = useIngredientContext();
+  const [articles, setArticles] = useState<Article[]>([]);
 
-  const {
-    ingredients,
-  } = useIngredientContext();
+  useEffect(() => {
+    // Convertir les ingrédients avec occurrences en articles
+    const articlesFromIngredients = ingredients.map((item) => ({
+      id: item.id,
+      name: item.name,
+      checked: false,
+      quantity: item.occurrences,
+      dlc: Array(item.occurrences).fill(''),
+    }));
 
-  Alert.alert(ingredients.length.toString())
+    setArticles(articlesFromIngredients);
+  }, [ingredients]);
 
   const toggleCheck = (id: string) => {
     setArticles(articles.map(a => a.id === id ? { ...a, checked: !a.checked } : a));
@@ -31,8 +38,8 @@ export default function RecapList() {
   const increment = (id: string) => {
     setArticles(articles.map(a => {
       if (a.id === id) {
-        const quantity = (a.quantity || 1) + 1;
-        const dlc = a.dlc ? [...a.dlc, ''] : Array(quantity).fill('');
+        const quantity = a.quantity + 1;
+        const dlc = [...a.dlc, ''];
         return { ...a, quantity, dlc };
       }
       return a;
@@ -42,8 +49,8 @@ export default function RecapList() {
   const decrement = (id: string) => {
     setArticles(articles.map(a => {
       if (a.id === id) {
-        const quantity = Math.max(1, (a.quantity || 1) - 1);
-        const dlc = a.dlc ? a.dlc.slice(0, quantity) : Array(quantity).fill('');
+        const quantity = Math.max(1, a.quantity - 1);
+        const dlc = a.dlc.slice(0, quantity);
         return { ...a, quantity, dlc };
       }
       return a;
@@ -52,7 +59,7 @@ export default function RecapList() {
 
   const setDlc = (articleId: string, idx: number, value: string) => {
     setArticles(articles.map(a => {
-      if (a.id === articleId && a.dlc) {
+      if (a.id === articleId) {
         const newDlc = [...a.dlc];
         newDlc[idx] = value;
         return { ...a, dlc: newDlc };
@@ -74,16 +81,15 @@ export default function RecapList() {
               <Text style={{ fontWeight: 'bold', fontSize: 24, marginLeft: 8 }}>{item.name}</Text>
               <View style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center' }}>
                 <Counter
-                  value={item.quantity ?? 1}
+                  value={item.quantity}
                   onIncrement={() => increment(item.id)}
                   onDecrement={() => decrement(item.id)}
                 />
               </View>
             </View>
-            {/* Champs DLC pour chaque occurence */}
-            {item.dlc && item.dlc.map((date: string, idx: number) => (
+
+            {item.dlc.map((date, idx) => (
               <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
-                {/* Icône crayon à styliser plus tard */}
                 <View style={{ width: 28, height: 28, borderWidth: 2, borderColor: '#888', borderRadius: 6, alignItems: 'center', justifyContent: 'center', marginRight: 8 }}>
                   <Text style={{ color: '#888', fontSize: 18 }}>✏️</Text>
                 </View>
@@ -105,4 +111,4 @@ export default function RecapList() {
       </View>
     </View>
   );
-} 
+}
