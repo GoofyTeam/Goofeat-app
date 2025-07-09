@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { FlatList, Text, TextInput, View } from 'react-native';
+import { Alert, FlatList, Text, TextInput, View } from 'react-native';
 import ArticleCard from '../../components/ArticleCard';
 import Button from '../../components/Button';
 import Checkbox from '../../components/Checkbox';
 import Counter from '../../components/Counter';
+import { useIngredientContext } from '@/context/IngredientContext';
 
 const initialArticles = [
   { id: '1', name: 'Sauce tomate', checked: false, quantity: 2, dlc: ['23/05/2027', '23/05/2027'] },
@@ -16,6 +17,12 @@ const initialArticles = [
 
 export default function RecapList() {
   const [articles, setArticles] = useState(initialArticles);
+
+  const {
+    ingredients,
+  } = useIngredientContext();
+
+  Alert.alert(ingredients.length.toString())
 
   const toggleCheck = (id: string) => {
     setArticles(articles.map(a => a.id === id ? { ...a, checked: !a.checked } : a));
