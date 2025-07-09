@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
-import { FlatList, Text, TextInput, View } from 'react-native';
-import ArticleCard from '../../components/ArticleCard';
-import Button from '../../components/Button';
-import Checkbox from '../../components/Checkbox';
-import Counter from '../../components/Counter';
+import '../../app/global.css';
+import NativeWindTest from '../../components/NativeWindTest';
 
 const initialArticles = [
   { id: '1', name: 'Sauce tomate', checked: false, quantity: 2, dlc: ['23/05/2027', '23/05/2027'] },
@@ -55,47 +52,6 @@ export default function RecapList() {
   };
 
   return (
-    <View style={{ flex: 1, padding: 24, justifyContent: 'center' }}>
-      <Text style={{ fontSize: 32, fontWeight: 'bold', marginBottom: 24 }}>Recap des articles</Text>
-      <FlatList
-        data={articles}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <ArticleCard highlighted={item.id === '1'}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Checkbox checked={item.checked} onChange={() => toggleCheck(item.id)} />
-              <Text style={{ fontWeight: 'bold', fontSize: 24, marginLeft: 8 }}>{item.name}</Text>
-              <View style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center' }}>
-                <Counter
-                  value={item.quantity ?? 1}
-                  onIncrement={() => increment(item.id)}
-                  onDecrement={() => decrement(item.id)}
-                />
-              </View>
-            </View>
-            {/* Champs DLC pour chaque occurence */}
-            {item.dlc && item.dlc.map((date: string, idx: number) => (
-              <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
-                {/* Icône crayon à styliser plus tard */}
-                <View style={{ width: 28, height: 28, borderWidth: 2, borderColor: '#888', borderRadius: 6, alignItems: 'center', justifyContent: 'center', marginRight: 8 }}>
-                  <Text style={{ color: '#888', fontSize: 18 }}>✏️</Text>
-                </View>
-                <TextInput
-                  value={date}
-                  onChangeText={v => setDlc(item.id, idx, v)}
-                  placeholder="JJ/MM/AAAA"
-                  style={{ borderWidth: 2, borderColor: '#888', borderRadius: 8, padding: 8, fontSize: 20, flex: 1 }}
-                />
-              </View>
-            ))}
-          </ArticleCard>
-        )}
-      />
-      <View style={{ marginTop: 32 }}>
-        <Button onPress={() => {}}>
-          Valider
-        </Button>
-      </View>
-    </View>
+    <NativeWindTest />
   );
 } 
