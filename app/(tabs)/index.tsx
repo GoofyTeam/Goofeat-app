@@ -1,57 +1,81 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import Button from '@/components/Button';
+import { useIngredientContext } from '@/context/IngredientContext';
+import { BarcodeScanningResult, CameraType, CameraView, useCameraPermissions } from 'expo-camera';
+import { useState } from 'react';
+import { Alert, Text, View } from 'react-native';
 
 export default function HomeScreen() {
+  const [facing, setFacing] = useState<CameraType>('back');
+  const [permission, requestPermission] = useCameraPermissions();
+  const [scanned, setScanned] = useState(false);
+
+  const {
+    addIngredient,
+  } = useIngredientContext();
+
+  if (!permission) return <View />;
+  if (!permission.granted) {
+    return (
+      <View>
+        <Text>Nous avons besoin de votre permission pour montrer la caméra</Text>
+        <Button onPress={requestPermission}>Donner les permissions</Button>
+      </View>
+    );
+  }
+
+  function toggleCameraFacing() {
+    setFacing(current => (current === 'back' ? 'front' : 'back'));
+  }
+
+  async function handleBarcodeScanned(result: BarcodeScanningResult) {
+    if (scanned) return;
+    setScanned(true);
+
+    const code = result?.data;
+    
+    const apiURL = "http://192.168.21.176:3000/product/barcode";
+    try {
+      const response = await fetch(`${apiURL}/${code}`, {
+        method: 'GET',
+      });
+
+      const data = await response.json();
+
+      Alert.alert(
+        "Ajouter au stock",
+        data.name, 
+        [
+          {
+            text: "Annuler",
+            style: "cancel"
+          },
+          {
+            text: "Ajouter",
+            onPress: () => {
+              addIngredient(data);
+            }
+          }
+        ],
+        { cancelable: false }
+      );
+    } catch (error) {
+      console.error('Error sending barcode:', error);
+    }
+
+    // Reset scanning after a few seconds (optional)
+    setTimeout(() => setScanned(false), 3000);
+  }
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Goofeat</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText>
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={{ flex: 1, padding: 24, rowGap: 24 }}>
+      <Text style={{ fontSize: 32, fontWeight: 'bold' }}>Scanner un article</Text>
+      <CameraView
+        facing={facing}
+        style={{ flex: 1 }}
+        barcodeScannerSettings={{ barcodeTypes: ['ean13', 'upc_a', 'ean8', 'upc_e'] }}
+        onBarcodeScanned={handleBarcodeScanned}
+      />
+      <Button onPress={toggleCameraFacing}>Tourner la caméra</Button>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
