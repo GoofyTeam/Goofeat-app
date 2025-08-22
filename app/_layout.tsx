@@ -1,5 +1,7 @@
 import { IngredientProvider } from '@/context/IngredientContext';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import '../global.css';
+import 'react-native-reanimated';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
