@@ -87,7 +87,6 @@ export default function RecapList() {
                 />
               </View>
             </View>
-
             {item.dlc.map((date, idx) => (
               <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
                 <View style={{ width: 28, height: 28, borderWidth: 2, borderColor: '#888', borderRadius: 6, alignItems: 'center', justifyContent: 'center', marginRight: 8 }}>
