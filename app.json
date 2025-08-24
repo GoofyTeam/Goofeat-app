@@ -44,6 +44,10 @@
 		],
 		"experiments": {
 			"typedRoutes": true
+		},
+		"extra": {
+			"API_DNS": "https://tedjy.ddns.net",
+			"API_VERSION": "/api/v1"
 		}
 	}
 }

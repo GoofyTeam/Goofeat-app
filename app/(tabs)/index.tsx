@@ -1,9 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
+import { API_URL } from '@/config';
 import { useIngredientContext } from '@/context/IngredientContext';
 import { BarcodeScanningResult, CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import { useState } from 'react';
 import { Alert, View } from 'react-native';
+
 
 export default function HomeScreen() {
   const [facing, setFacing] = useState<CameraType>('back');
@@ -33,7 +35,7 @@ export default function HomeScreen() {
     setScanned(true);
 
     const code = result?.data;
-    const apiURL = "http://192.168.21.17:3000/product/barcode";
+    const apiURL = `${API_URL}/product/barcode`;
     try {
       const response = await fetch(`${apiURL}/${code}`, {
         method: 'GET',
