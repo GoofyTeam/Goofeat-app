@@ -2,8 +2,9 @@ import { useIngredientContext } from '@/context/IngredientContext';
 import React, { useEffect, useState } from 'react';
 import { FlatList, Text, TextInput, View } from 'react-native';
 import ArticleCard from '../../components/ArticleCard';
-import Button from '../../components/Button';
-import Checkbox from '../../components/Checkbox';
+
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import Counter from '../../components/Counter';
 
 interface Article {
@@ -77,7 +78,7 @@ export default function RecapList() {
         renderItem={({ item }) => (
           <ArticleCard highlighted={item.id === '1'}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Checkbox checked={item.checked} onChange={() => toggleCheck(item.id)} />
+              <Checkbox checked={item.checked} onCheckedChange={()=> toggleCheck(item.id)} />
               <Text style={{ fontWeight: 'bold', fontSize: 24, marginLeft: 8 }}>{item.name}</Text>
               <View style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center' }}>
                 <Counter
