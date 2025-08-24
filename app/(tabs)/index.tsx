@@ -1,8 +1,9 @@
-import Button from '@/components/Button';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 import { useIngredientContext } from '@/context/IngredientContext';
 import { BarcodeScanningResult, CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import { useState } from 'react';
-import { Alert, Text, View } from 'react-native';
+import { Alert, View } from 'react-native';
 
 export default function HomeScreen() {
   const [facing, setFacing] = useState<CameraType>('back');
