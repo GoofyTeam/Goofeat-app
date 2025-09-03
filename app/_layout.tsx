@@ -1,4 +1,5 @@
 import { IngredientProvider } from '@/context/IngredientContext';
+import { AuthProvider } from '@/context/AuthContext';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
@@ -21,13 +22,20 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={/* colorScheme === 'dark' ? DarkTheme : */DefaultTheme}>
-      <IngredientProvider>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="auto" />
-      </IngredientProvider>
+      <AuthProvider>
+        <IngredientProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            {/* Public group */}
+            <Stack.Screen name="(public)" />
+
+            {/* Authenticated app group */}
+            <Stack.Screen name="(auth)" />
+
+            <Stack.Screen name="+not-found" />
+          </Stack>
+          <StatusBar style="auto" />
+        </IngredientProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

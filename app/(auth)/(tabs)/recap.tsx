@@ -1,11 +1,11 @@
 import { useIngredientContext } from '@/context/IngredientContext';
 import React, { useEffect, useState } from 'react';
 import { FlatList, Text, TextInput, View } from 'react-native';
-import ArticleCard from '../../components/ArticleCard';
+import ArticleCard from '@/components/ArticleCard';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import Counter from '../../components/Counter';
+import Counter from '@/components/Counter';
 
 interface Article {
   id: string;
@@ -112,3 +112,4 @@ export default function RecapList() {
     </View>
   );
 }
+ 
