@@ -10,19 +10,12 @@ export const useProfile = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [allergies, setAllergies] = useState('');
-  const [otherRestrictions, setOtherRestrictions] = useState('');
+  const [allergenes, setAllergenes] = useState<string[]>([]);
+  const [preferredCategories, setPreferredCategories] = useState<string[]>([]);
+  const [excludedCategories, setExcludedCategories] = useState<string[]>([]);
   const [dietaryRestrictions, setDietaryRestrictions] = useState({
-    vegetarian: false,
     vegan: false,
-    halal: false,
-    kosher: false,
     glutenFree: false,
-    lactoseFree: false,
-    noPork: false,
-    noSeafood: false,
-    noNuts: false,
-    noEggs: false,
   });
 
   // États de chargement
@@ -45,21 +38,19 @@ export const useProfile = () => {
         setEmail(profile.email || '');
 
         if (profile.dietaryRestrictions) {
-          const { allergenes, dietaryRestrictions } =
-            profile.dietaryRestrictions;
-          setAllergies(allergenes.join(', '));
+          const {
+            allergenes,
+            preferredCategories,
+            excludedCategories,
+            dietaryRestrictions,
+          } = profile.dietaryRestrictions;
+          setAllergenes(allergenes || []);
+          setPreferredCategories(preferredCategories || []);
+          setExcludedCategories(excludedCategories || []);
           setDietaryRestrictions((prev) => ({
             ...prev,
-            vegetarian: dietaryRestrictions.includes('vegetarian'),
             vegan: dietaryRestrictions.includes('vegan'),
-            halal: dietaryRestrictions.includes('halal'),
-            kosher: dietaryRestrictions.includes('kosher'),
             glutenFree: dietaryRestrictions.includes('gluten_free'),
-            lactoseFree: dietaryRestrictions.includes('lactose_free'),
-            noPork: dietaryRestrictions.includes('no_pork'),
-            noSeafood: dietaryRestrictions.includes('no_seafood'),
-            noNuts: dietaryRestrictions.includes('no_nuts'),
-            noEggs: dietaryRestrictions.includes('no_eggs'),
           }));
         }
       } catch (error) {
@@ -77,26 +68,13 @@ export const useProfile = () => {
   // Convertir vers format API
   const convertToApiFormat = () => {
     const restrictions: string[] = [];
-    if (dietaryRestrictions.vegetarian) restrictions.push('vegetarian');
     if (dietaryRestrictions.vegan) restrictions.push('vegan');
-    if (dietaryRestrictions.halal) restrictions.push('halal');
-    if (dietaryRestrictions.kosher) restrictions.push('kosher');
     if (dietaryRestrictions.glutenFree) restrictions.push('gluten_free');
-    if (dietaryRestrictions.lactoseFree) restrictions.push('lactose_free');
-    if (dietaryRestrictions.noPork) restrictions.push('no_pork');
-    if (dietaryRestrictions.noSeafood) restrictions.push('no_seafood');
-    if (dietaryRestrictions.noNuts) restrictions.push('no_nuts');
-    if (dietaryRestrictions.noEggs) restrictions.push('no_eggs');
 
     return {
-      allergenes: allergies.trim()
-        ? allergies
-            .split(',')
-            .map((a) => a.trim())
-            .filter((a) => a)
-        : [],
-      preferredCategories: [],
-      excludedCategories: [],
+      allergenes,
+      preferredCategories,
+      excludedCategories,
       dietaryRestrictions: restrictions,
     };
   };
@@ -226,10 +204,12 @@ export const useProfile = () => {
     setLastName,
     email,
     setEmail,
-    allergies,
-    setAllergies,
-    otherRestrictions,
-    setOtherRestrictions,
+    allergenes,
+    setAllergenes,
+    preferredCategories,
+    setPreferredCategories,
+    excludedCategories,
+    setExcludedCategories,
     dietaryRestrictions,
     loading,
     passwordLoading,

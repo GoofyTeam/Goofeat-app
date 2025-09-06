@@ -20,10 +20,12 @@ export default function AccountScreen() {
     setLastName,
     email,
     setEmail,
-    allergies,
-    setAllergies,
-    otherRestrictions,
-    setOtherRestrictions,
+    allergenes,
+    setAllergenes,
+    preferredCategories,
+    setPreferredCategories,
+    excludedCategories,
+    setExcludedCategories,
     dietaryRestrictions,
     loading,
     passwordLoading,
@@ -97,51 +99,26 @@ export default function AccountScreen() {
           <View className='gap-3'>
             <Label>Allergies alimentaires</Label>
             <Textarea
-              value={allergies}
-              onChangeText={setAllergies}
-              placeholder='Listez vos allergies (ex: arachides, fruits de mer, lait...)'
+              value={allergenes.join(', ')}
+              onChangeText={(text) =>
+                setAllergenes(
+                  text
+                    .split(',')
+                    .map((a) => a.trim())
+                    .filter((a) => a)
+                )
+              }
+              placeholder='Listez vos allergies (ex: arachides, fruits de mer, lactose...)'
               className='min-h-[80px]'
             />
-          </View>
-
-          <View className='gap-4'>
-            <Label>Régimes alimentaires</Label>
-            <View className='gap-3'>
-              {[
-                { key: 'vegetarian', label: 'Végétarien' },
-                { key: 'vegan', label: 'Végan' },
-                { key: 'halal', label: 'Halal' },
-                { key: 'kosher', label: 'Kosher' },
-              ].map(({ key, label }) => (
-                <View key={key} className='flex-row items-center gap-3'>
-                  <Checkbox
-                    checked={
-                      dietaryRestrictions[
-                        key as keyof typeof dietaryRestrictions
-                      ]
-                    }
-                    onCheckedChange={() =>
-                      toggleDietaryRestriction(
-                        key as keyof typeof dietaryRestrictions
-                      )
-                    }
-                  />
-                  <Label>{label}</Label>
-                </View>
-              ))}
-            </View>
           </View>
 
           <View className='gap-4'>
             <Label>Restrictions alimentaires</Label>
             <View className='gap-3'>
               {[
+                { key: 'vegan', label: 'Végan' },
                 { key: 'glutenFree', label: 'Sans gluten' },
-                { key: 'lactoseFree', label: 'Sans lactose' },
-                { key: 'noPork', label: 'Pas de porc' },
-                { key: 'noSeafood', label: 'Pas de fruits de mer' },
-                { key: 'noNuts', label: 'Pas de noix' },
-                { key: 'noEggs', label: 'Pas d&apos;œufs' },
               ].map(({ key, label }) => (
                 <View key={key} className='flex-row items-center gap-3'>
                   <Checkbox
@@ -163,12 +140,36 @@ export default function AccountScreen() {
           </View>
 
           <View className='gap-3'>
-            <Label>Autres restrictions</Label>
+            <Label>Catégories préférées</Label>
             <Textarea
-              value={otherRestrictions}
-              onChangeText={setOtherRestrictions}
-              placeholder='Autres préférences ou restrictions alimentaires...'
-              className='min-h-[80px]'
+              value={preferredCategories.join(', ')}
+              onChangeText={(text) =>
+                setPreferredCategories(
+                  text
+                    .split(',')
+                    .map((a) => a.trim())
+                    .filter((a) => a)
+                )
+              }
+              placeholder='Ex: légumes, fruits, céréales...'
+              className='min-h-[60px]'
+            />
+          </View>
+
+          <View className='gap-3'>
+            <Label>Catégories à éviter</Label>
+            <Textarea
+              value={excludedCategories.join(', ')}
+              onChangeText={(text) =>
+                setExcludedCategories(
+                  text
+                    .split(',')
+                    .map((a) => a.trim())
+                    .filter((a) => a)
+                )
+              }
+              placeholder='Ex: viande rouge, produits transformés...'
+              className='min-h-[60px]'
             />
           </View>
         </View>
