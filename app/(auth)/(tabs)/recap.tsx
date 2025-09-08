@@ -1,5 +1,3 @@
-import ArticleCard from '@/components/ArticleCard';
-import Counter from '@/components/Counter';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useArticles } from '@/hooks/useArticles';
@@ -14,9 +12,6 @@ export default function RecapList() {
     totalStocks,
     handleSearchChange,
     toggleCheck,
-    increment,
-    decrement,
-    setDlc,
   } = useArticles();
 
   if (loading) {
@@ -54,39 +49,28 @@ export default function RecapList() {
       ) : (
         <ScrollView showsVerticalScrollIndicator={false} className='flex-1'>
           {articles.map((item) => (
-            <ArticleCard key={item.id} highlighted={item.id === '1'}>
-              <View className='flex-row items-center'>
-                <Checkbox
-                  checked={item.checked}
-                  onCheckedChange={() => toggleCheck(item.id)}
-                />
-                <View className='flex-1'>
-                  <Text className='font-bold text-2xl ml-2'>{item.name}</Text>
-                  <Text className='text-base text-gray-600 ml-2'>
-                    {item.quantity} {item.unit}
-                  </Text>
-                </View>
-                <View className='flex-row items-center'>
-                  <Counter
-                    value={item.quantity}
-                    onIncrement={() => increment(item.id)}
-                    onDecrement={() => decrement(item.id)}
+            <View key={item.id} className='mb-3'>
+              <View className='flex-row items-center justify-between bg-white rounded-lg p-4 border border-gray-200'>
+                <View className='flex-row items-center flex-1'>
+                  <Checkbox
+                    checked={item.checked}
+                    onCheckedChange={() => toggleCheck(item.id)}
+                    className='mr-3'
                   />
+                  <View className='flex-1'>
+                    <Text className='font-medium text-base' numberOfLines={1}>
+                      {item.name}
+                    </Text>
+                    <Text className='text-sm text-gray-500 mt-1'>
+                      {item.quantity} {item.unit}
+                    </Text>
+                  </View>
+                </View>
+                <View className='w-8 h-8 rounded-md items-center justify-center bg-gray-100'>
+                  <Text className='text-gray-500 text-xs'>✏️</Text>
                 </View>
               </View>
-
-              <View className='flex-row items-center mt-2'>
-                <View className='w-7 h-7 border-2 border-gray-400 rounded-md items-center justify-center mr-2'>
-                  <Text className='text-gray-400 text-lg'>✏️</Text>
-                </View>
-                <TextInput
-                  value={item.dlc}
-                  onChangeText={(v) => setDlc(item.id, v)}
-                  placeholder='JJ/MM/AAAA'
-                  className='border-2 border-gray-400 rounded-lg p-2 text-xl flex-1'
-                />
-              </View>
-            </ArticleCard>
+            </View>
           ))}
         </ScrollView>
       )}
