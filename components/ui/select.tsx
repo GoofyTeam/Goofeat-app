@@ -35,7 +35,11 @@ function SelectTrigger({
       {...props}
     >
       {children}
-      <ChevronDown size={16} aria-hidden={true} className='text-foreground opacity-50' />
+      <ChevronDown
+        size={16}
+        aria-hidden={true}
+        className='text-foreground opacity-50'
+      />
     </SelectPrimitive.Trigger>
   );
 }
@@ -43,13 +47,19 @@ function SelectTrigger({
 /**
  * Platform: WEB ONLY
  */
-function SelectScrollUpButton({ className, ...props }: SelectPrimitive.ScrollUpButtonProps) {
+function SelectScrollUpButton({
+  className,
+  ...props
+}: SelectPrimitive.ScrollUpButtonProps) {
   if (Platform.OS !== 'web') {
     return null;
   }
   return (
     <SelectPrimitive.ScrollUpButton
-      className={cn('flex web:cursor-default items-center justify-center py-1', className)}
+      className={cn(
+        'flex web:cursor-default items-center justify-center py-1',
+        className
+      )}
       {...props}
     >
       <ChevronUp size={14} className='text-foreground' />
@@ -60,13 +70,19 @@ function SelectScrollUpButton({ className, ...props }: SelectPrimitive.ScrollUpB
 /**
  * Platform: WEB ONLY
  */
-function SelectScrollDownButton({ className, ...props }: SelectPrimitive.ScrollDownButtonProps) {
+function SelectScrollDownButton({
+  className,
+  ...props
+}: SelectPrimitive.ScrollDownButtonProps) {
   if (Platform.OS !== 'web') {
     return null;
   }
   return (
     <SelectPrimitive.ScrollDownButton
-      className={cn('flex web:cursor-default items-center justify-center py-1', className)}
+      className={cn(
+        'flex web:cursor-default items-center justify-center py-1',
+        className
+      )}
       {...props}
     >
       <ChevronDown size={14} className='text-foreground' />
@@ -89,7 +105,9 @@ function SelectContent({
 
   return (
     <SelectPrimitive.Portal hostName={portalHost}>
-      <SelectPrimitive.Overlay style={Platform.OS !== 'web' ? StyleSheet.absoluteFill : undefined}>
+      <SelectPrimitive.Overlay
+        style={Platform.OS !== 'web' ? StyleSheet.absoluteFill : undefined}
+      >
         <Animated.View className='z-50' entering={FadeIn} exiting={FadeOut}>
           <SelectPrimitive.Content
             className={cn(
@@ -149,7 +167,7 @@ function SelectItem({
   return (
     <SelectPrimitive.Item
       className={cn(
-        'relative web:group flex flex-row w-full web:cursor-default web:select-none items-center rounded-sm py-1.5 native:py-2 pl-8 native:pl-10 pr-2 web:hover:bg-accent/50 active:bg-accent web:outline-none web:focus:bg-accent',
+        'relative web:group cursor-pointer flex flex-row w-full web:cursor-default web:select-none items-center rounded-sm py-1.5 native:py-2 pl-8 native:pl-10 pr-2 web:hover:bg-accent/50 active:bg-accent web:outline-none web:focus:bg-accent',
         props.disabled && 'web:pointer-events-none opacity-50',
         className
       )}
@@ -157,10 +175,14 @@ function SelectItem({
     >
       <View className='absolute left-2 native:left-3.5 flex h-3.5 native:pt-px w-3.5 items-center justify-center'>
         <SelectPrimitive.ItemIndicator>
-          <Check size={16} strokeWidth={3} className='text-popover-foreground' />
+          <Check
+            size={16}
+            strokeWidth={3}
+            className='text-popover-foreground'
+          />
         </SelectPrimitive.ItemIndicator>
       </View>
-      <SelectPrimitive.ItemText className='text-sm native:text-lg text-popover-foreground native:text-base web:group-focus:text-accent-foreground' />
+      <SelectPrimitive.ItemText className='text-sm text-popover-foreground native:text-base web:group-focus:text-accent-foreground' />
     </SelectPrimitive.Item>
   );
 }
@@ -172,21 +194,23 @@ function SelectSeparator({
   ref?: React.RefObject<SelectPrimitive.SeparatorRef>;
 }) {
   return (
-    <SelectPrimitive.Separator className={cn('-mx-1 my-1 h-px bg-muted', className)} {...props} />
+    <SelectPrimitive.Separator
+      className={cn('-mx-1 my-1 h-px bg-muted', className)}
+      {...props}
+    />
   );
 }
 
 export {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectScrollDownButton,
-    SelectScrollUpButton,
-    SelectSeparator,
-    SelectTrigger,
-    SelectValue,
-    type Option
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectScrollDownButton,
+  SelectScrollUpButton,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+  type Option,
 };
-

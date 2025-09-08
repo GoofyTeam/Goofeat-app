@@ -1,6 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
+import UnitSelect from '@/components/UnitSelect';
+import { UnitType } from '@/constants/Units';
 import { useManualForm } from '@/hooks/useManualForm';
 import React from 'react';
 import { FlatList, ScrollView, TouchableOpacity, View } from 'react-native';
@@ -96,10 +98,12 @@ export default function ManualFormComponent({
           </View>
           <View className='flex-1'>
             <Text className='mb-2 font-semibold'>Unité *</Text>
-            <Input
-              placeholder='unité, kg, L...'
+            <UnitSelect
               value={manualForm.unit}
-              onChangeText={(text) => handleFieldChange('unit', text)}
+              onValueChange={(unit: UnitType) =>
+                handleFieldChange('unit', unit)
+              }
+              placeholder='Sélectionner une unité'
             />
           </View>
         </View>

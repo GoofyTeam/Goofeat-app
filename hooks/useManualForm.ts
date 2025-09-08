@@ -1,3 +1,4 @@
+import { UnitType } from '@/constants/Units';
 import { useAuth } from '@/context/AuthContext';
 import { useIngredientContext } from '@/context/IngredientContext';
 import {
@@ -15,7 +16,7 @@ export interface ManualFormData {
   name: string;
   brand: string;
   quantity: string;
-  unit: string;
+  unit: UnitType | '';
   dlc: string;
   selectedIngredientId: string;
 }
