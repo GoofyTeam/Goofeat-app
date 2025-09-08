@@ -1,9 +1,14 @@
+import { MultiSelect } from '@/components/MultiSelect';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Text } from '@/components/ui/text';
-import { Textarea } from '@/components/ui/textarea';
+import {
+  ALLERGENES,
+  DIETARY_RESTRICTIONS,
+  EXCLUDED_CATEGORIES,
+  PREFERRED_CATEGORIES,
+} from '@/constants/FoodPreferences';
 import { useAuth } from '@/context/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useRouter } from 'expo-router';
@@ -27,6 +32,7 @@ export default function AccountScreen() {
     excludedCategories,
     setExcludedCategories,
     dietaryRestrictions,
+    setDietaryRestrictions,
     loading,
     passwordLoading,
     showPasswordChange,
@@ -38,7 +44,6 @@ export default function AccountScreen() {
     setConfirmPassword,
     updateProfile,
     changePassword,
-    toggleDietaryRestriction,
     setShowPasswordChange,
   } = useProfile();
 
@@ -54,7 +59,6 @@ export default function AccountScreen() {
       <View className='flex-1 p-6 gap-6'>
         <Text className='text-3xl font-bold'>Profil</Text>
 
-        {/* Informations personnelles */}
         <View className='gap-6'>
           <Text className='text-xl font-semibold text-gray-700'>
             Informations personnelles
@@ -90,91 +94,62 @@ export default function AccountScreen() {
           </View>
         </View>
 
-        {/* Préférences alimentaires */}
         <View className='gap-6'>
           <Text className='text-xl font-semibold text-gray-700'>
             Préférences alimentaires
           </Text>
 
-          <View className='gap-3'>
-            <Label>Allergies alimentaires</Label>
-            <Textarea
-              value={allergenes.join(', ')}
-              onChangeText={(text) =>
-                setAllergenes(
-                  text
-                    .split(',')
-                    .map((a) => a.trim())
-                    .filter((a) => a)
-                )
-              }
-              placeholder='Listez vos allergies (ex: arachides, fruits de mer, lactose...)'
-              className='min-h-[80px]'
-            />
-          </View>
+          <MultiSelect
+            label='Allergies alimentaires'
+            options={ALLERGENES}
+            selectedValues={allergenes}
+            onSelectionChange={setAllergenes}
+            placeholder='Sélectionner vos allergies'
+            searchPlaceholder='Rechercher une allergie...'
+          />
 
-          <View className='gap-4'>
-            <Label>Restrictions alimentaires</Label>
-            <View className='gap-3'>
-              {[
-                { key: 'vegan', label: 'Végan' },
-                { key: 'glutenFree', label: 'Sans gluten' },
-              ].map(({ key, label }) => (
-                <View key={key} className='flex-row items-center gap-3'>
-                  <Checkbox
-                    checked={
-                      dietaryRestrictions[
-                        key as keyof typeof dietaryRestrictions
-                      ]
-                    }
-                    onCheckedChange={() =>
-                      toggleDietaryRestriction(
-                        key as keyof typeof dietaryRestrictions
-                      )
-                    }
-                  />
-                  <Label>{label}</Label>
-                </View>
-              ))}
-            </View>
-          </View>
+          <MultiSelect
+            label='Restrictions alimentaires'
+            options={DIETARY_RESTRICTIONS.map((r) => r.label)}
+            selectedValues={DIETARY_RESTRICTIONS.filter(
+              (r) => dietaryRestrictions[r.key]
+            ).map((r) => r.label)}
+            onSelectionChange={(selectedLabels) => {
+              const selectedKeys = DIETARY_RESTRICTIONS.filter((r) =>
+                selectedLabels.includes(r.label)
+              ).map((r) => r.key);
 
-          <View className='gap-3'>
-            <Label>Catégories préférées</Label>
-            <Textarea
-              value={preferredCategories.join(', ')}
-              onChangeText={(text) =>
-                setPreferredCategories(
-                  text
-                    .split(',')
-                    .map((a) => a.trim())
-                    .filter((a) => a)
-                )
-              }
-              placeholder='Ex: légumes, fruits, céréales...'
-              className='min-h-[60px]'
-            />
-          </View>
+              const newRestrictions: Record<string, boolean> = {};
+              DIETARY_RESTRICTIONS.forEach((restriction) => {
+                newRestrictions[restriction.key] = selectedKeys.includes(
+                  restriction.key
+                );
+              });
+              setDietaryRestrictions(newRestrictions);
+            }}
+            placeholder='Sélectionner vos restrictions'
+            searchPlaceholder='Rechercher une restriction...'
+          />
 
-          <View className='gap-3'>
-            <Label>Catégories à éviter</Label>
-            <Textarea
-              value={excludedCategories.join(', ')}
-              onChangeText={(text) =>
-                setExcludedCategories(
-                  text
-                    .split(',')
-                    .map((a) => a.trim())
-                    .filter((a) => a)
-                )
-              }
-              placeholder='Ex: viande rouge, produits transformés...'
-              className='min-h-[60px]'
-            />
-          </View>
+          <MultiSelect
+            label='Catégories préférées'
+            options={PREFERRED_CATEGORIES}
+            selectedValues={preferredCategories}
+            onSelectionChange={setPreferredCategories}
+            placeholder='Sélectionner vos catégories préférées'
+            searchPlaceholder='Rechercher une catégorie...'
+          />
+
+          <MultiSelect
+            label='Catégories à éviter'
+            options={EXCLUDED_CATEGORIES}
+            selectedValues={excludedCategories}
+            onSelectionChange={setExcludedCategories}
+            placeholder='Sélectionner les catégories à éviter'
+            searchPlaceholder='Rechercher une catégorie...'
+          />
         </View>
 
-        {/* Changement de mot de passe */}
         <View className='gap-6'>
           <Text className='text-xl font-semibold text-gray-700'>Sécurité</Text>
 

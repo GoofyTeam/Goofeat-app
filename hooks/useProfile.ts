@@ -1,24 +1,37 @@
+import { DIETARY_RESTRICTIONS } from '@/constants/FoodPreferences';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/services/api';
 import { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 
+const API_KEY_MAPPING: Record<string, string> = {
+  glutenFree: 'gluten_free',
+  lactoseFree: 'lactose_free',
+  lowCarb: 'low_carb',
+  lowFat: 'low_fat',
+  lowSodium: 'low_sodium',
+};
+
+const getApiKey = (interfaceKey: string): string => {
+  return API_KEY_MAPPING[interfaceKey] || interfaceKey;
+};
+
 export const useProfile = () => {
   const { user, refreshMe, logout } = useAuth();
 
-  // États du formulaire
+  // STATES
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [allergenes, setAllergenes] = useState<string[]>([]);
   const [preferredCategories, setPreferredCategories] = useState<string[]>([]);
   const [excludedCategories, setExcludedCategories] = useState<string[]>([]);
-  const [dietaryRestrictions, setDietaryRestrictions] = useState({
-    vegan: false,
-    glutenFree: false,
-  });
+  const [dietaryRestrictions, setDietaryRestrictions] = useState<
+    Record<string, boolean>
+  >({});
+  const [notificationSettings, setNotificationSettings] = useState({});
 
-  // États de chargement
+  // LOADING STATES
   const [loading, setLoading] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [showPasswordChange, setShowPasswordChange] = useState(false);
@@ -26,7 +39,7 @@ export const useProfile = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  // Charger le profil
+  // LOAD PROFILE
   useEffect(() => {
     const loadProfile = async () => {
       try {
@@ -39,21 +52,32 @@ export const useProfile = () => {
         setLastName(profile.lastName || '');
         setEmail(profile.email || '');
 
-        if (profile.dietaryRestrictions) {
+        console.log(profile);
+
+        // LOAD PREFERENCES
+        if (profile.preferences) {
           const {
             allergenes,
             preferredCategories,
             excludedCategories,
             dietaryRestrictions,
-          } = profile.dietaryRestrictions;
+          } = profile.preferences;
+
           setAllergenes(allergenes || []);
           setPreferredCategories(preferredCategories || []);
           setExcludedCategories(excludedCategories || []);
-          setDietaryRestrictions((prev) => ({
-            ...prev,
-            vegan: dietaryRestrictions.includes('vegan'),
-            glutenFree: dietaryRestrictions.includes('gluten_free'),
-          }));
+          const restrictionsMap: Record<string, boolean> = {};
+          DIETARY_RESTRICTIONS.forEach((restriction) => {
+            const apiKey = getApiKey(restriction.key);
+            restrictionsMap[restriction.key] =
+              dietaryRestrictions?.includes(apiKey) || false;
+          });
+          setDietaryRestrictions(restrictionsMap);
+        }
+
+        // LOAD NOTIFICATION SETTINGS
+        if (profile.notificationSettings) {
+          setNotificationSettings(profile.notificationSettings);
         }
       } catch (error) {
         console.error('Erreur lors du chargement du profil:', error);
@@ -67,11 +91,15 @@ export const useProfile = () => {
     loadProfile();
   }, [user]);
 
-  // Convertir vers format API
+  // CONVERT TO API FORMAT
   const convertToApiFormat = () => {
     const restrictions: string[] = [];
-    if (dietaryRestrictions.vegan) restrictions.push('vegan');
-    if (dietaryRestrictions.glutenFree) restrictions.push('gluten_free');
+    Object.entries(dietaryRestrictions).forEach(([key, value]) => {
+      if (value) {
+        const apiKey = getApiKey(key);
+        restrictions.push(apiKey);
+      }
+    });
 
     return {
       allergenes,
@@ -81,7 +109,7 @@ export const useProfile = () => {
     };
   };
 
-  // Mettre à jour le profil
+  // UPDATE PROFILE
   const updateProfile = async () => {
     if (!firstName.trim() || !lastName.trim() || !email.trim()) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs obligatoires');
@@ -107,6 +135,7 @@ export const useProfile = () => {
       });
 
       const dietaryData = convertToApiFormat();
+      console.log("Données envoyées à l'API:", dietaryData);
       await apiFetch('/user/profile/dietary-restrictions', {
         method: 'PATCH',
         version: 'v2',
@@ -140,7 +169,7 @@ export const useProfile = () => {
     }
   };
 
-  // Changer le mot de passe
+  // UPDATE PASSWORD
   const changePassword = async () => {
     if (
       !currentPassword.trim() ||
@@ -196,13 +225,32 @@ export const useProfile = () => {
     }
   };
 
-  // Toggle restriction alimentaire
-  const toggleDietaryRestriction = (key: keyof typeof dietaryRestrictions) => {
+  // TOGGLE DIETARY RESTRICTION
+  const toggleDietaryRestriction = (key: string) => {
     setDietaryRestrictions((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+  // UPDATE NOTIFICATION SETTINGS
+  const updateNotificationSettings = async (settings: any) => {
+    try {
+      await apiFetch('/user/profile/notification-settings', {
+        method: 'PATCH',
+        version: 'v2',
+        body: JSON.stringify({ notificationSettings: settings }),
+      });
+
+      setNotificationSettings(settings);
+      Alert.alert('Succès', 'Paramètres de notification mis à jour');
+    } catch {
+      Alert.alert(
+        'Erreur',
+        'Échec de la mise à jour des paramètres de notification'
+      );
+    }
+  };
+
   return {
-    // États
+    // STATES
     firstName,
     setFirstName,
     lastName,
@@ -216,6 +264,7 @@ export const useProfile = () => {
     excludedCategories,
     setExcludedCategories,
     dietaryRestrictions,
+    setDietaryRestrictions,
     loading,
     passwordLoading,
     showPasswordChange,
@@ -225,11 +274,14 @@ export const useProfile = () => {
     setNewPassword,
     confirmPassword,
     setConfirmPassword,
+    notificationSettings,
+    setNotificationSettings,
 
-    // Actions
+    // FUNCTIONS
     updateProfile,
     changePassword,
     toggleDietaryRestriction,
     setShowPasswordChange,
+    updateNotificationSettings,
   };
 };
