@@ -1,0 +1,61 @@
+export const ALLERGENES = [
+  'arachides',
+  'fruits de mer',
+  'lactose',
+  'gluten',
+  'œufs',
+  'soja',
+  'noix',
+  'sésame',
+  'moutarde',
+  'céleri',
+  'sulfites',
+  'poisson',
+  'mollusques',
+  'lupin',
+];
+
+export const PREFERRED_CATEGORIES = [
+  'légumes',
+  'fruits',
+  'céréales',
+  'protéines végétales',
+  'produits laitiers',
+  'viande blanche',
+  'poisson',
+  'légumineuses',
+  'noix et graines',
+  'herbes et épices',
+  'céréales complètes',
+  'produits bio',
+];
+
+export const EXCLUDED_CATEGORIES = [
+  'viande rouge',
+  'produits transformés',
+  'fast food',
+  'sucreries',
+  'boissons sucrées',
+  'aliments frits',
+  'charcuterie',
+  'plats préparés',
+  'additifs artificiels',
+  'conservateurs',
+  'colorants artificiels',
+  'arômes artificiels',
+];
+
+export const DIETARY_RESTRICTIONS = [
+  { key: 'vegan', label: 'Végan' },
+  { key: 'vegetarian', label: 'Végétarien' },
+  { key: 'glutenFree', label: 'Sans gluten' },
+  { key: 'lactoseFree', label: 'Sans lactose' },
+  { key: 'halal', label: 'Halal' },
+  { key: 'kosher', label: 'Kosher' },
+  { key: 'keto', label: 'Keto' },
+  { key: 'paleo', label: 'Paléo' },
+  { key: 'raw', label: 'Crudivore' },
+  { key: 'lowCarb', label: 'Faible en glucides' },
+  { key: 'lowFat', label: 'Faible en gras' },
+  { key: 'lowSodium', label: 'Faible en sodium' },
+];
