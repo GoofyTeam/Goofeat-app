@@ -30,7 +30,9 @@ export const useProfile = () => {
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const { data: profile } = (await apiFetch('/api/v2/user/profile')) as {
+        const { data: profile } = (await apiFetch('/user/profile', {
+          version: 'v2',
+        })) as {
           data: any;
         };
         setFirstName(profile.firstName || '');
@@ -94,8 +96,9 @@ export const useProfile = () => {
 
     setLoading(true);
     try {
-      await apiFetch('/api/v2/user/profile/basic-info', {
+      await apiFetch('/user/profile/basic-info', {
         method: 'PATCH',
+        version: 'v2',
         body: JSON.stringify({
           firstName: firstName.trim(),
           lastName: lastName.trim(),
@@ -104,8 +107,9 @@ export const useProfile = () => {
       });
 
       const dietaryData = convertToApiFormat();
-      await apiFetch('/api/v2/user/profile/dietary-restrictions', {
+      await apiFetch('/user/profile/dietary-restrictions', {
         method: 'PATCH',
+        version: 'v2',
         body: JSON.stringify(dietaryData),
       });
 
@@ -162,8 +166,9 @@ export const useProfile = () => {
 
     setPasswordLoading(true);
     try {
-      await apiFetch('/api/v2/user/profile/password', {
+      await apiFetch('/user/profile/password', {
         method: 'PATCH',
+        version: 'v2',
         body: JSON.stringify({
           currentPassword: currentPassword.trim(),
           newPassword: newPassword.trim(),

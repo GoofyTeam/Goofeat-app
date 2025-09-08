@@ -1,4 +1,4 @@
-import { API_URL } from '@/config';
+import { API_URL_V1 } from '@/config';
 import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 import { Platform } from 'react-native';
@@ -79,7 +79,7 @@ export function logout() {
 // OAuth helpers
 
 export function getOAuthStartUrl(provider: 'google' | 'apple') {
-  return `${API_URL}/auth/${provider}`;
+  return `${API_URL_V1}/auth/${provider}`;
 }
 
 export async function openOAuth(provider: 'google' | 'apple') {
