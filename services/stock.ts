@@ -211,6 +211,41 @@ export async function getStocks(
 }
 
 /**
+ * Met à jour un stock existant via l'API
+ */
+export async function updateStock(
+  stockId: string,
+  stockData: StockData,
+  token?: string
+): Promise<StockResponse> {
+  try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_URL_V1}/stock/${stockId}`, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify(stockData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du stock:', error);
+    throw error;
+  }
+}
+
+/**
  * Recherche des ingrédients par terme de recherche
  */
 export async function searchIngredients(

@@ -128,6 +128,10 @@ export function useArticles() {
     updateArticle(articleId, { unit });
   };
 
+  const refreshArticles = useCallback(() => {
+    loadStocks();
+  }, [loadStocks]);
+
   return {
     articles: filteredArticles,
     loading,
@@ -139,5 +143,6 @@ export function useArticles() {
     decrement,
     setDlc,
     setUnit,
+    refreshArticles,
   };
 }
