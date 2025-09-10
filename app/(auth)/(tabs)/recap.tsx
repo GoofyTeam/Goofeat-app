@@ -1,8 +1,15 @@
+import EditArticleModal from '@/components/EditArticleModal';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useArticles } from '@/hooks/useArticles';
-import React from 'react';
-import { ScrollView, Text, TextInput, View } from 'react-native';
+import { Article, useArticles } from '@/hooks/useArticles';
+import React, { useState } from 'react';
+import {
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export default function RecapList() {
   const {
@@ -12,7 +19,25 @@ export default function RecapList() {
     totalStocks,
     handleSearchChange,
     toggleCheck,
+    refreshArticles,
   } = useArticles();
+
+  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleEditArticle = (article: Article) => {
+    setSelectedArticle(article);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedArticle(null);
+  };
+
+  const handleModalSuccess = () => {
+    refreshArticles();
+  };
 
   if (loading) {
     return (
@@ -66,9 +91,12 @@ export default function RecapList() {
                     </Text>
                   </View>
                 </View>
-                <View className='w-8 h-8 rounded-md items-center justify-center bg-gray-100'>
+                <TouchableOpacity
+                  onPress={() => handleEditArticle(item)}
+                  className='w-8 h-8 rounded-md items-center justify-center bg-gray-100'
+                >
                   <Text className='text-gray-500 text-xs'>✏️</Text>
-                </View>
+                </TouchableOpacity>
               </View>
             </View>
           ))}
@@ -78,6 +106,13 @@ export default function RecapList() {
       <View className='mt-8'>
         <Button onPress={() => {}}>Valider</Button>
       </View>
+
+      <EditArticleModal
+        article={selectedArticle}
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        onSuccess={handleModalSuccess}
+      />
     </View>
   );
 }
