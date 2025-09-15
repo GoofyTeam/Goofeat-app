@@ -3,6 +3,7 @@ import { Text } from '@/components/ui/text';
 import { useAuth } from '@/context/AuthContext';
 import { useIngredientContext } from '@/context/IngredientContext';
 import { createStock, getProductByBarcode } from '@/services/stock';
+import { useHousehold } from '@/context/HouseholdContext';
 import {
   BarcodeScanningResult,
   CameraType,
@@ -11,6 +12,7 @@ import {
 } from 'expo-camera';
 import { useState } from 'react';
 import { Alert, View } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 
 interface ScannerComponentProps {
   onSuccess?: () => void;
@@ -23,6 +25,8 @@ export default function ScannerComponent({ onSuccess }: ScannerComponentProps) {
 
   const { addIngredient } = useIngredientContext();
   const { token } = useAuth();
+  const { currentHouseholdId } = useHousehold();
+  const isFocused = useIsFocused();
 
   if (!permission) return <View />;
 
@@ -67,8 +71,9 @@ export default function ScannerComponent({ onSuccess }: ScannerComponentProps) {
                   productId: data.id || data.productId,
                   categoryId: data.categoryId,
                   quantity: 1,
-                  unit: data.unit || 'unité',
+                  unit: data.unit || 'unit',
                   dlc: data.dlc,
+                  householdId: currentHouseholdId,
                 };
 
                 await createStock(stockData, token);
@@ -104,14 +109,24 @@ export default function ScannerComponent({ onSuccess }: ScannerComponentProps) {
 
   return (
     <View className='flex-1 gap-4'>
-      <CameraView
-        facing={facing}
-        className='flex-1'
-        barcodeScannerSettings={{
-          barcodeTypes: ['ean13', 'upc_a', 'ean8', 'upc_e'],
-        }}
-        onBarcodeScanned={handleBarcodeScanned}
-      />
+      {/* Fixed aspect ratio container helps Android render the preview reliably */}
+      <View className='w-full rounded-xl overflow-hidden bg-black/10' style={{ aspectRatio: 3 / 4 }}>
+        {isFocused ? (
+          <CameraView
+            key={`camera-${facing}`}
+            facing={facing}
+            style={{ flex: 1 }}
+            barcodeScannerSettings={{
+              barcodeTypes: ['ean13', 'upc_a', 'ean8', 'upc_e', 'code128'],
+            }}
+            onBarcodeScanned={handleBarcodeScanned}
+          />
+        ) : (
+          <View className='flex-1 items-center justify-center bg-black/20'>
+            <Text className='text-gray-500'>Scanner inactif</Text>
+          </View>
+        )}
+      </View>
       <Button onPress={toggleCameraFacing}>Tourner la caméra</Button>
     </View>
   );

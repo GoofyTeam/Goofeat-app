@@ -20,6 +20,7 @@ import UnitSelect from '@/components/UnitSelect';
 import { CATEGORIES } from '@/constants/Categories';
 import { UnitType } from '@/constants/Units';
 import { useAuth } from '@/context/AuthContext';
+import { useHousehold } from '@/context/HouseholdContext';
 import { Article } from '@/hooks/useArticles';
 import { StockData, updateStock } from '@/services/stock';
 import React, { useEffect, useState } from 'react';
@@ -39,6 +40,7 @@ export default function EditArticleModal({
   onSuccess,
 }: EditArticleModalProps) {
   const { token } = useAuth();
+  const { currentHouseholdId } = useHousehold();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     quantity: '',
@@ -82,6 +84,7 @@ export default function EditArticleModal({
         unit: formData.unit,
         dlc: formData.dlc || undefined,
         categoryId: formData.categoryId || undefined,
+        householdId: currentHouseholdId,
       };
 
       await updateStock(article.id, stockData, token);

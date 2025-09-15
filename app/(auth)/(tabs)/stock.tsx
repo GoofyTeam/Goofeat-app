@@ -1,7 +1,7 @@
 import EditArticleModal from '@/components/EditArticleModal';
-import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Article, useArticles } from '@/hooks/useArticles';
+import { TopNav } from '@/components/TopNav';
 import React, { useState } from 'react';
 import {
   ScrollView,
@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 
-export default function RecapList() {
+export default function StockList() {
   const {
     articles,
     loading,
@@ -42,14 +42,15 @@ export default function RecapList() {
   if (loading) {
     return (
       <View className='flex-1 p-6 justify-center items-center'>
-        <Text className='text-lg'>Chargement des stocks...</Text>
+        <Text className='text-lg'>Chargement du stock...</Text>
       </View>
     );
   }
 
   return (
     <View className='flex-1 p-6'>
-      <Text className='text-3xl font-bold mb-2'>Recap des articles</Text>
+      <TopNav />
+      <Text className='text-3xl font-bold mb-2'>Stock du foyer</Text>
       <Text className='text-base text-gray-600 mb-6'>
         {searchTerm
           ? `${articles.length} résultat(s) pour "${searchTerm}"`
@@ -102,11 +103,6 @@ export default function RecapList() {
           ))}
         </ScrollView>
       )}
-
-      <View className='mt-8'>
-        <Button onPress={() => {}}>Valider</Button>
-      </View>
-
       <EditArticleModal
         article={selectedArticle}
         isOpen={isModalOpen}
