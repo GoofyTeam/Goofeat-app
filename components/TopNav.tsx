@@ -9,7 +9,7 @@ export function TopNav({ title }: { title?: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const canGoBack = (navigation as any)?.canGoBack?.() ?? false;
-  const primaryPaths = new Set(['/', '/stock', '/account']);
+  const primaryPaths = new Set(['/', '/stock', '/recipes', '/account']);
   const onPrimaryTab = pathname ? primaryPaths.has(pathname) : false;
 
   // Compute a fallback path like "/households" from "/households/settings"
@@ -21,7 +21,7 @@ export function TopNav({ title }: { title?: string }) {
   })();
 
   const canFallback = fallbackPath && fallbackPath !== pathname && !onPrimaryTab;
-  const showBack = (!onPrimaryTab) && (canGoBack || canFallback);
+  const showBack = (!onPrimaryTab) && (canGoBack || canFallback) && pathname !== '/households/onboarding';
 
   const onHouseholds = pathname.startsWith('/households');
 
