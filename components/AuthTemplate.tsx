@@ -53,9 +53,9 @@ export function AuthTemplate({
 									<AuthSocialButtons buttonClassName="w-full" />
 									<View className="flex-row items-center gap-3 w-full">
 										<Separator className="flex-1 w-auto shrink bg-gray-300" />
-										<Text className="text-gray-500 text-sm">
-											Or continue with
-										</Text>
+                            <Text className="text-gray-500 text-sm">
+                                Ou continuer avec
+                            </Text>
 										<Separator className="flex-1 w-auto shrink bg-gray-300" />
 									</View>
 								</>
@@ -66,12 +66,11 @@ export function AuthTemplate({
 					</CardContent>
 				</Card>
 
-				{displayDisclaimer && (
-					<Text className="text-gray-500 text-center text-xs text-balance">
-						By clicking continue, you agree to our Terms of Service and Privacy
-						Policy.
-					</Text>
-				)}
+                {displayDisclaimer && (
+                    <Text className="text-gray-500 text-center text-xs text-balance">
+                        En cliquant sur Continuer, vous acceptez nos Conditions d’utilisation et notre Politique de confidentialité.
+                    </Text>
+                )}
 			</View>
 		</View>
 	);

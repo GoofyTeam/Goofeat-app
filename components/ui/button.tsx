@@ -10,6 +10,8 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: 'bg-green-700 text-white web:hover:opacity-90 active:opacity-90',
+        // Use Tailwind core colors for NativeWind compatibility
+        destructive: 'bg-red-600 text-white web:hover:opacity-90 active:opacity-90',
         outline:
           'border border-input bg-background web:hover:bg-accent web:hover:text-accent-foreground active:bg-accent',
       },
@@ -34,6 +36,7 @@ const buttonTextVariants = cva(
     variants: {
       variant: {
         default: 'text-white',
+        destructive: 'text-white',
         outline: 'group-active:text-accent-foreground',
       },
       size: {
@@ -73,4 +76,3 @@ function Button({ ref, className, variant, size, children, ...props }: ButtonPro
 
 export { Button, buttonTextVariants, buttonVariants };
 export type { ButtonProps };
-

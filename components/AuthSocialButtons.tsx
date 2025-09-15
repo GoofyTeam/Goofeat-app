@@ -31,7 +31,7 @@ export function AuthSocialButtons({
       <Button className={buttonClassName} variant="outline" onPress={onGoogle}>
         <View className="flex-row items-center gap-2">
           <Ionicons name="logo-google" size={18} />
-          <Text>Continue with Google</Text>
+          <Text>Continuer avec Google</Text>
         </View>
       </Button>
     </View>

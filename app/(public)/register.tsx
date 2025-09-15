@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/context/AuthContext';
 import React, { useState, useMemo } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, View, Platform } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 
 export default function Register() {
@@ -31,17 +31,23 @@ export default function Register() {
 
 	const handleRegister = async () => {
 		if (!isValid) {
-			Alert.alert('Invalid form', 'Please fill all fields correctly.');
+			const msg = 'Veuillez remplir correctement tous les champs.';
+			if (Platform.OS === 'web' && typeof window !== 'undefined') window.alert(msg);
+			else Alert.alert('Formulaire invalide', msg);
 			return;
 		}
 		setLoading(true);
 		try {
 			await register({ firstName, lastName, email, password });
-			Alert.alert('Success', 'Account created. Please verify your email.');
+			const successMsg = 'Compte créé. Veuillez vérifier votre e‑mail.';
+			if (Platform.OS === 'web' && typeof window !== 'undefined') window.alert(successMsg);
+			else Alert.alert('Succès', successMsg);
 			// Redirect to login with a notice to verify email
 			router.replace('/login?notice=verify');
 		} catch (e: any) {
-			Alert.alert('Error', e.message || 'Registration failed');
+			const message = e?.message || "Échec de l'inscription";
+			if (Platform.OS === 'web' && typeof window !== 'undefined') window.alert(message);
+			else Alert.alert('Erreur', message);
 		} finally {
 			setLoading(false);
 		}
@@ -49,47 +55,47 @@ export default function Register() {
 
     return (
         <AuthTemplate
-            title="Create an account"
-            description="Register with your Apple or Google account"
+            title="Créer un compte"
+            description="Inscrivez-vous avec votre compte Apple ou Google"
             showSocial
             displayDisclaimer
         >
             <View className="grid gap-6">
                 <View className="grid gap-3">
-                    <Label>First name</Label>
+                    <Label>Prénom</Label>
                     <Input value={firstName} onChangeText={setFirstName} />
                 </View>
                 <View className="grid gap-3">
-                    <Label>Last name</Label>
+                    <Label>Nom</Label>
                     <Input value={lastName} onChangeText={setLastName} />
                 </View>
                 <View className="grid gap-3">
-                    <Label>Email</Label>
-                    <Input keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={setEmail} placeholder="m@example.com" />
+                    <Label>E‑mail</Label>
+                    <Input keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={setEmail} placeholder="exemple@domaine.com" />
                     {email.length > 0 && !/[^\s@]+@[^\s@]+\.[^\s@]+/.test(email) ? (
-                      <Text className="text-destructive text-xs">Enter a valid email address</Text>
+                      <Text className="text-destructive text-xs">Veuillez saisir une adresse e‑mail valide</Text>
                     ) : null}
                 </View>
                 <View className="grid gap-3">
-                    <Label>Password</Label>
+                    <Label>Mot de passe</Label>
                     <Input secureTextEntry autoCapitalize="none" value={password} onChangeText={setPassword} />
                     {password.length > 0 && password.length < 8 ? (
-                      <Text className="text-destructive text-xs">Password must be at least 8 characters</Text>
+                      <Text className="text-destructive text-xs">Le mot de passe doit contenir au moins 8 caractères</Text>
                     ) : null}
                 </View>
                 <View className="grid gap-3">
-                    <Label>Confirm password</Label>
+                    <Label>Confirmer le mot de passe</Label>
                     <Input secureTextEntry autoCapitalize="none" value={confirmPassword} onChangeText={setConfirmPassword} />
                     {confirmPassword.length > 0 && confirmPassword !== password ? (
-                      <Text className="text-destructive text-xs">Passwords do not match</Text>
+                      <Text className="text-destructive text-xs">Les mots de passe ne correspondent pas</Text>
                     ) : null}
                 </View>
                 
-                <Button className="w-full" disabled={loading || !isValid} onPress={handleRegister}>Create account</Button>
+                <Button className="w-full" disabled={loading || !isValid} onPress={handleRegister}>Créer un compte</Button>
                 <Text className="text-center text-sm">
-                    Already have an account?{' '}
+                    Vous avez déjà un compte ?{' '}
                     <Link href="/login" asChild>
-                        <Text className="underline underline-offset-4">Log in</Text>
+                        <Text className="underline underline-offset-4">Se connecter</Text>
                     </Link>
                 </Text>
             </View>

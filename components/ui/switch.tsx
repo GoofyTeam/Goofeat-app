@@ -1,3 +1,4 @@
+import { useColorScheme } from '@/hooks/useColorScheme.web';
 import { cn } from '@/lib/utils';
 import * as SwitchPrimitives from '@rn-primitives/switch';
 import * as React from 'react';
@@ -8,7 +9,6 @@ import Animated, {
     useDerivedValue,
     withTiming,
 } from 'react-native-reanimated';
-import { useColorScheme } from '~/lib/useColorScheme';
 
 function SwitchWeb({
   className,
@@ -20,7 +20,7 @@ function SwitchWeb({
     <SwitchPrimitives.Root
       className={cn(
         'peer flex-row h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed',
-        props.checked ? 'bg-primary' : 'bg-input',
+        props.checked ? 'bg-blue-600' : 'bg-input',
         props.disabled && 'opacity-50',
         className
       )}
@@ -28,7 +28,7 @@ function SwitchWeb({
     >
       <SwitchPrimitives.Thumb
         className={cn(
-          'pointer-events-none block h-5 w-5 rounded-full bg-background shadow-md shadow-foreground/5 ring-0 transition-transform',
+          'pointer-events-none block h-5 w-5 rounded-full bg-white shadow-md shadow-foreground/5 ring-0 transition-transform',
           props.checked ? 'translate-x-5' : 'translate-x-0'
         )}
       />
@@ -38,11 +38,13 @@ function SwitchWeb({
 
 const RGB_COLORS = {
   light: {
-    primary: 'rgb(24, 24, 27)',
+    // iOS-like blue
+    primary: 'rgb(37, 99, 235)',
     input: 'rgb(228, 228, 231)',
   },
   dark: {
-    primary: 'rgb(250, 250, 250)',
+    // iOS-like blue
+    primary: 'rgb(37, 99, 235)',
     input: 'rgb(39, 39, 42)',
   },
 } as const;
@@ -53,7 +55,7 @@ function SwitchNative({
 }: SwitchPrimitives.RootProps & {
   ref?: React.RefObject<SwitchPrimitives.RootRef>;
 }) {
-  const { colorScheme } = useColorScheme();
+  const colorScheme  = useColorScheme() || 'light';
   const translateX = useDerivedValue(() => (props.checked ? 18 : 0));
   const animatedRootStyle = useAnimatedStyle(() => {
     return {
@@ -74,15 +76,14 @@ function SwitchNative({
     >
       <SwitchPrimitives.Root
         className={cn(
-          'flex-row h-8 w-[46px] shrink-0 items-center rounded-full border-2 border-transparent',
-          props.checked ? 'bg-primary' : 'bg-input',
+          'flex-row h-8 w-[46px] shrink-0 items-center rounded-full border-2 border-transparent bg-transparent',
           className
         )}
         {...props}
       >
         <Animated.View style={animatedThumbStyle}>
           <SwitchPrimitives.Thumb
-            className={'h-7 w-7 rounded-full bg-background shadow-md shadow-foreground/25 ring-0'}
+            className={'h-7 w-7 rounded-full bg-white shadow-md shadow-foreground/25 ring-0'}
           />
         </Animated.View>
       </SwitchPrimitives.Root>

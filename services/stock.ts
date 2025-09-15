@@ -1,4 +1,4 @@
-import { API_URL_V1 } from '@/config';
+import { apiFetch, buildQuery } from '@/services/api';
 
 export interface StockData {
 	productId?: string;
@@ -6,6 +6,7 @@ export interface StockData {
 	quantity: number;
 	unit: string;
 	dlc?: string;
+	householdId?: string;
 }
 
 export interface StockResponse {
@@ -75,89 +76,56 @@ export interface ProductResponse {
  * Crée un nouveau stock via l'API
  */
 export async function createStock(
-	stockData: StockData,
-	token?: string
+    stockData: StockData,
+    token?: string
 ): Promise<StockResponse> {
-	try {
-		const headers: Record<string, string> = {
-			'Content-Type': 'application/json',
-		};
-
-		if (token) {
-			headers['Authorization'] = `Bearer ${token}`;
-		}
-
-		const response = await fetch(`${API_URL_V1}/stocks`, {
-			method: 'POST',
-			headers,
-			body: JSON.stringify(stockData),
-		});
-
-		if (!response.ok) {
-			throw new Error(`Erreur ${response.status}: ${response.statusText}`);
-		}
-
-		const result = await response.json();
-		return result;
-	} catch (error) {
-		console.error('Erreur lors de la création du stock:', error);
-		throw error;
-	}
+    try {
+        const { data } = await apiFetch<StockResponse>(`/stocks`, {
+            method: 'POST',
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+            body: JSON.stringify(stockData),
+        });
+        return data;
+    } catch (error) {
+        console.error('Erreur lors de la création du stock:', error);
+        throw error;
+    }
 }
 
 /**
  * Récupère les informations d'un produit via son code-barres
  */
 export async function getProductByBarcode(barcode: string): Promise<any> {
-	try {
-		const response = await fetch(`${API_URL_V1}/product/barcode/${barcode}`, {
-			method: 'GET',
-		});
-
-		if (!response.ok) {
-			throw new Error(`Erreur ${response.status}: ${response.statusText}`);
-		}
-
-		const data = await response.json();
-		return data;
-	} catch (error) {
-		console.error('Erreur lors de la récupération du produit:', error);
-		throw error;
-	}
+    try {
+        const { data } = await apiFetch<any>(
+            `/product/barcode/${encodeURIComponent(barcode)}`,
+            { method: 'GET' }
+        );
+        return data;
+    } catch (error) {
+        console.error('Erreur lors de la récupération du produit:', error);
+        throw error;
+    }
 }
 
 /**
  * Crée un nouveau produit via l'API
  */
 export async function createProduct(
-	productData: ProductData,
-	token?: string
+    productData: ProductData,
+    token?: string
 ): Promise<ProductResponse> {
-	try {
-		const headers: Record<string, string> = {
-			'Content-Type': 'application/json',
-		};
-
-		if (token) {
-			headers['Authorization'] = `Bearer ${token}`;
-		}
-
-		const response = await fetch(`${API_URL_V1}/product`, {
-			method: 'POST',
-			headers,
-			body: JSON.stringify(productData),
-		});
-
-		if (!response.ok) {
-			throw new Error(`Erreur ${response.status}: ${response.statusText}`);
-		}
-
-		const result = await response.json();
-		return result;
-	} catch (error) {
-		console.error('Erreur lors de la création du produit:', error);
-		throw error;
-	}
+    try {
+        const { data } = await apiFetch<ProductResponse>(`/product`, {
+            method: 'POST',
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+            body: JSON.stringify(productData),
+        });
+        return data;
+    } catch (error) {
+        console.error('Erreur lors de la création du produit:', error);
+        throw error;
+    }
 }
 
 export interface GetStocksParams {
@@ -165,109 +133,74 @@ export interface GetStocksParams {
 	limit?: number;
 	offset?: number;
 	search?: string;
+	householdId?: string;
 }
 
 /**
  * Récupère tous les stocks de l'utilisateur avec pagination et recherche
  */
 export async function getStocks(
-	token?: string,
-	params?: GetStocksParams
+    token?: string,
+    params?: GetStocksParams
 ): Promise<StocksApiResponse> {
-	try {
-		const headers: Record<string, string> = {};
-
-		if (token) {
-			headers['Authorization'] = `Bearer ${token}`;
-		}
-
-		// Construire les paramètres de requête
-		const queryParams = new URLSearchParams();
-		if (params?.page) queryParams.append('page', params.page.toString());
-		if (params?.limit) queryParams.append('limit', params.limit.toString());
-		if (params?.offset) queryParams.append('offset', params.offset.toString());
-		if (params?.search) queryParams.append('search', params.search);
-
-		const queryString = queryParams.toString();
-		const url = queryString
-			? `${API_URL_V1}/stocks?${queryString}`
-			: `${API_URL_V1}/stocks`;
-
-		const response = await fetch(url, {
-			method: 'GET',
-			headers,
-		});
-
-		if (!response.ok) {
-			throw new Error(`Erreur ${response.status}: ${response.statusText}`);
-		}
-
-		const data = await response.json();
-		return data;
-	} catch (error) {
-		console.error('Erreur lors de la récupération des stocks:', error);
-		throw error;
-	}
+    try {
+        const qs = buildQuery({
+            page: params?.page?.toString(),
+            limit: params?.limit?.toString(),
+            offset: params?.offset?.toString(),
+            search: params?.search,
+            householdId: params?.householdId,
+        });
+        const { data } = await apiFetch<StocksApiResponse>(`/stocks${qs}`, {
+            method: 'GET',
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        });
+        return data;
+    } catch (error) {
+        console.error('Erreur lors de la récupération des stocks:', error);
+        throw error;
+    }
 }
 
 /**
  * Met à jour un stock existant via l'API
  */
 export async function updateStock(
-	stockId: string,
-	stockData: StockData,
-	token?: string
+    stockId: string,
+    stockData: StockData,
+    token?: string
 ): Promise<StockResponse> {
-	try {
-		const headers: Record<string, string> = {
-			'Content-Type': 'application/json',
-		};
-
-		if (token) {
-			headers['Authorization'] = `Bearer ${token}`;
-		}
-
-		const response = await fetch(`${API_URL_V1}/stocks/${stockId}`, {
-			method: 'PATCH',
-			headers,
-			body: JSON.stringify(stockData),
-		});
-
-		if (!response.ok) {
-			throw new Error(`Erreur ${response.status}: ${response.statusText}`);
-		}
-
-		const result = await response.json();
-		return result;
-	} catch (error) {
-		console.error('Erreur lors de la mise à jour du stock:', error);
-		throw error;
-	}
+    try {
+        const { data } = await apiFetch<StockResponse>(`/stocks/${stockId}`, {
+            method: 'PATCH',
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+            body: JSON.stringify(stockData),
+        });
+        return data;
+    } catch (error) {
+        console.error('Erreur lors de la mise à jour du stock:', error);
+        throw error;
+    }
 }
 
 /**
  * Recherche des ingrédients par terme de recherche
  */
 export async function searchIngredients(
-	search: string,
-	limit: number = 10
+    search: string,
+    limit: number = 10
 ): Promise<Ingredient[]> {
-	try {
-		const response = await fetch(
-			`${API_URL_V1}/ingredients?search=${encodeURIComponent(search)}&limit=${limit}`,
-			{
-				method: 'GET',
-			}
-		);
-
-		if (!response.ok) {
-			throw new Error(`Erreur ${response.status}: ${response.statusText}`);
-		}
-
-		const data = await response.json();
-		return data;
-	} catch (error) {
-		console.error("Erreur lors de la recherche d'ingrédients:", error);
-		throw error;
-	}
+    try {
+        const qs = buildQuery({
+            search: search || undefined,
+            limit: String(limit ?? 10),
+        });
+        const { data } = await apiFetch<Ingredient[]>(`/ingredients${qs}`, {
+            method: 'GET',
+        });
+        return data;
+    } catch (error) {
+        console.error("Erreur lors de la recherche d'ingrédients:", error);
+        throw error;
+    }
 }

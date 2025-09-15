@@ -1,5 +1,6 @@
 import { IngredientProvider } from '@/context/IngredientContext';
 import { AuthProvider } from '@/context/AuthContext';
+import { HouseholdProvider } from '@/context/HouseholdContext';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
@@ -23,7 +24,8 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={/* colorScheme === 'dark' ? DarkTheme : */DefaultTheme}>
       <AuthProvider>
-        <IngredientProvider>
+        <HouseholdProvider>
+          <IngredientProvider>
           <Stack screenOptions={{ headerShown: false }}>
             {/* Public group */}
             <Stack.Screen name="(public)" />
@@ -34,7 +36,8 @@ export default function RootLayout() {
             <Stack.Screen name="+not-found" />
           </Stack>
           <StatusBar style="auto" />
-        </IngredientProvider>
+          </IngredientProvider>
+        </HouseholdProvider>
       </AuthProvider>
     </ThemeProvider>
   );

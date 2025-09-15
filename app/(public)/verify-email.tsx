@@ -18,10 +18,10 @@ export default function VerifyEmailScreen() {
       setStatus('pending');
       try {
         const res = await verifyEmail(params.token);
-        setMessage(res?.message || 'Email verified');
+        setMessage(res?.message || 'Adresse e‑mail vérifiée');
         setStatus('success');
       } catch (e: any) {
-        setMessage(e?.message || 'Verification failed');
+        setMessage(e?.message || 'Échec de la vérification');
         setStatus('error');
       }
     };
@@ -29,9 +29,9 @@ export default function VerifyEmailScreen() {
   }, [params.token]);
 
   return (
-    <AuthTemplate title="Verify email" description="Confirming your email address…">
-      <Text className="text-center">{status === 'pending' ? 'Verifying…' : message}</Text>
-      <Button className="w-full" onPress={() => router.replace('/login')}>Go to login</Button>
+    <AuthTemplate title="Vérifier l’e‑mail" description="Confirmation de votre adresse e‑mail…">
+      <Text className="text-center">{status === 'pending' ? 'Vérification en cours…' : message}</Text>
+      <Button className="w-full" onPress={() => router.replace('/login')}>Aller à la connexion</Button>
     </AuthTemplate>
   );
 }
