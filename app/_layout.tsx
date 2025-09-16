@@ -1,6 +1,7 @@
 import { IngredientProvider } from '@/context/IngredientContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { HouseholdProvider } from '@/context/HouseholdContext';
+import { PortalHost } from '@rn-primitives/portal';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
@@ -26,16 +27,17 @@ export default function RootLayout() {
       <AuthProvider>
         <HouseholdProvider>
           <IngredientProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            {/* Public group */}
-            <Stack.Screen name="(public)" />
+            <Stack screenOptions={{ headerShown: false }}>
+              {/* Public group */}
+              <Stack.Screen name="(public)" />
 
-            {/* Authenticated app group */}
-            <Stack.Screen name="(auth)" />
+              {/* Authenticated app group */}
+              <Stack.Screen name="(auth)" />
 
-            <Stack.Screen name="+not-found" />
-          </Stack>
-          <StatusBar style="auto" />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+            <PortalHost />
+            <StatusBar style="auto" />
           </IngredientProvider>
         </HouseholdProvider>
       </AuthProvider>

@@ -1,5 +1,4 @@
 import EditArticleModal from '@/components/EditArticleModal';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Article, useArticles } from '@/hooks/useArticles';
 import { TopNav } from '@/components/TopNav';
 import React, { useState } from 'react';
@@ -10,6 +9,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { formatDateForDisplay } from '@/lib/date';
+import { UnitLabels } from '@/constants/Units';
 
 export default function StockList() {
   const {
@@ -18,7 +19,6 @@ export default function StockList() {
     searchTerm,
     totalStocks,
     handleSearchChange,
-    toggleCheck,
     refreshArticles,
   } = useArticles();
 
@@ -78,17 +78,15 @@ export default function StockList() {
             <View key={item.id} className='mb-3'>
               <View className='flex-row items-center justify-between bg-white rounded-lg p-4 border border-gray-200'>
                 <View className='flex-row items-center flex-1'>
-                  <Checkbox
-                    checked={item.checked}
-                    onCheckedChange={() => toggleCheck(item.id)}
-                    className='mr-3'
-                  />
                   <View className='flex-1'>
                     <Text className='font-medium text-base' numberOfLines={1}>
                       {item.name}
                     </Text>
                     <Text className='text-sm text-gray-500 mt-1'>
-                      {item.quantity} {item.unit}
+                      {item.quantity} {UnitLabels[item.unit]}
+                    </Text>
+                    <Text className='text-sm text-gray-500 mt-1'>
+                      {formatDateForDisplay(new Date(item.dlc))}
                     </Text>
                   </View>
                 </View>

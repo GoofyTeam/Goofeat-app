@@ -12,6 +12,11 @@ import {
 } from '@/services/stock';
 import { useCallback, useState } from 'react';
 import { Alert } from 'react-native';
+import {
+	formatDateForApi,
+	isBeforeToday,
+	parseDisplayDate,
+} from '@/lib/date';
 
 export interface ManualFormData {
 	name: string;
@@ -134,6 +139,26 @@ export function useManualForm(onSuccess?: () => void) {
 		}
 
 		const quantity = parseFloat(manualForm.quantity);
+		const trimmedDlc = manualForm.dlc.trim();
+		let formattedDlc: string | undefined;
+
+		if (trimmedDlc) {
+			const parsedDlc = parseDisplayDate(trimmedDlc);
+			if (!parsedDlc) {
+				Alert.alert('Erreur', 'La date doit être au format JJ/MM/AAAA');
+				return;
+			}
+
+			if (isBeforeToday(parsedDlc)) {
+				Alert.alert(
+					'Erreur',
+					"La date limite ne peut pas être antérieure à aujourd'hui"
+				);
+				return;
+			}
+
+			formattedDlc = formatDateForApi(parsedDlc);
+		}
 
 		try {
 			// Créer le produit d'abord
@@ -159,7 +184,7 @@ export function useManualForm(onSuccess?: () => void) {
 				categoryId: manualForm.selectedIngredientId || undefined,
 				quantity: quantity,
 				unit: manualForm.unit,
-				dlc: manualForm.dlc || undefined,
+				dlc: formattedDlc,
 				householdId: currentHouseholdId,
 			};
 

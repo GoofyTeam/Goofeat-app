@@ -4,7 +4,7 @@ import { ChevronUp } from '@/lib/icons/ChevronUp';
 import { cn } from '@/lib/utils';
 import * as SelectPrimitive from '@rn-primitives/select';
 import * as React from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 type Option = SelectPrimitive.Option;
@@ -101,40 +101,88 @@ function SelectContent({
   className?: string;
   portalHost?: string;
 }) {
-  const { open } = SelectPrimitive.useRootContext();
+  const {
+    open,
+    onOpenChange,
+    setContentLayout,
+    setTriggerPosition,
+  } = SelectPrimitive.useRootContext();
+
+  const dismiss = React.useCallback(() => {
+    setTriggerPosition(null);
+    setContentLayout(null);
+    onOpenChange(false);
+  }, [onOpenChange, setContentLayout, setTriggerPosition]);
+
+  const contentClasses = cn(
+    'relative z-50 max-h-96 min-w-[8rem] rounded-md border border-border bg-popover shadow-md shadow-foreground/10 py-2 px-1 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+    position === 'popper' &&
+      'data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1',
+    Platform.OS === 'web'
+      ? open
+        ? 'web:zoom-in-95 web:animate-in web:fade-in-0'
+        : 'web:zoom-out-95 web:animate-out web:fade-out-0'
+      : undefined,
+    className
+  );
 
   return (
     <SelectPrimitive.Portal hostName={portalHost}>
       <SelectPrimitive.Overlay
+        closeOnPress={Platform.OS === 'web'}
+        pointerEvents={Platform.OS === 'web' ? 'auto' : 'box-none'}
         style={Platform.OS !== 'web' ? StyleSheet.absoluteFill : undefined}
       >
-        <Animated.View className='z-50' entering={FadeIn} exiting={FadeOut}>
-          <SelectPrimitive.Content
-            className={cn(
-              'relative z-50 max-h-96 min-w-[8rem] rounded-md border border-border bg-popover shadow-md shadow-foreground/10 py-2 px-1 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
-              position === 'popper' &&
-                'data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1',
-              open
-                ? 'web:zoom-in-95 web:animate-in web:fade-in-0'
-                : 'web:zoom-out-95 web:animate-out web:fade-out-0',
-              className
-            )}
-            position={position}
-            {...props}
-          >
-            <SelectScrollUpButton />
-            <SelectPrimitive.Viewport
-              className={cn(
-                'p-1',
-                position === 'popper' &&
-                  'h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]'
-              )}
+        {Platform.OS === 'web' ? (
+          <Animated.View className='z-50' entering={FadeIn} exiting={FadeOut}>
+            <SelectPrimitive.Content className={contentClasses} position={position} {...props}>
+              <SelectScrollUpButton />
+              <SelectPrimitive.Viewport
+                className={cn(
+                  'p-1',
+                  position === 'popper' &&
+                    'h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]'
+                )}
+              >
+                {children}
+              </SelectPrimitive.Viewport>
+              <SelectScrollDownButton />
+            </SelectPrimitive.Content>
+          </Animated.View>
+        ) : (
+          <View style={StyleSheet.absoluteFill} pointerEvents='box-none'>
+            <Pressable
+              style={StyleSheet.absoluteFill}
+              onPress={dismiss}
+              pointerEvents='box-only'
+            />
+            <Animated.View
+              className='z-50'
+              entering={FadeIn}
+              exiting={FadeOut}
+              pointerEvents='box-none'
             >
-              {children}
-            </SelectPrimitive.Viewport>
-            <SelectScrollDownButton />
-          </SelectPrimitive.Content>
-        </Animated.View>
+              <SelectPrimitive.Content
+                className={contentClasses}
+                position={position}
+                onStartShouldSetResponder={() => false}
+                {...props}
+              >
+                <SelectScrollUpButton />
+                <SelectPrimitive.Viewport
+                  className={cn(
+                    'p-1',
+                    position === 'popper' &&
+                      'h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]'
+                  )}
+                >
+                  {children}
+                </SelectPrimitive.Viewport>
+                <SelectScrollDownButton />
+              </SelectPrimitive.Content>
+            </Animated.View>
+          </View>
+        )}
       </SelectPrimitive.Overlay>
     </SelectPrimitive.Portal>
   );
