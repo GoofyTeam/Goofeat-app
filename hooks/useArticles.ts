@@ -8,7 +8,6 @@ import { useCallback, useEffect, useState } from 'react';
 export interface Article {
 	id: string;
 	name: string;
-	checked: boolean;
 	quantity: number;
 	unit: UnitType;
 	dlc: string;
@@ -38,7 +37,6 @@ export function useArticles() {
 			const articlesFromStocks = stocksResponse.data.map((stock) => ({
 				id: stock.id,
 				name: stock.product.name,
-				checked: false,
 				quantity: stock.quantity,
 				unit: (stock.unit as UnitType) || PieceUnit.UNIT,
 				dlc: stock.dlc || '',
@@ -52,7 +50,6 @@ export function useArticles() {
 			const articlesFromIngredients = ingredients.map((item) => ({
 				id: item.id,
 				name: item.name,
-				checked: false,
 				quantity: item.occurrences,
 				unit: PieceUnit.UNIT,
 				dlc: '',
@@ -97,13 +94,6 @@ export function useArticles() {
 		);
 	}, []);
 
-	const toggleCheck = (id: string) => {
-		const article = allArticles.find((a) => a.id === id);
-		if (article) {
-			updateArticle(id, { checked: !article.checked });
-		}
-	};
-
 	const increment = (id: string) => {
 		const article = allArticles.find((a) => a.id === id);
 		if (article) {
@@ -136,7 +126,6 @@ export function useArticles() {
 		searchTerm,
 		totalStocks,
 		handleSearchChange,
-		toggleCheck,
 		increment,
 		decrement,
 		setDlc,
