@@ -43,11 +43,11 @@ export default function JoinHouseholdScreen() {
 
       <View className="gap-3">
         <Label>Nom (optionnel)</Label>
-        <Input value={nickname} onChangeText={setNickname} placeholder="e.g. Dad, Roomie..." />
+        <Input value={nickname} onChangeText={setNickname} placeholder="e.g. Papa..." />
       </View>
 
       <Button disabled={!canSubmit || loading} onPress={handleJoin}>
-        {loading ? 'Joining...' : 'Join'}
+        {loading ? 'Adhésion...' : 'Rejoindre le foyer'}
       </Button>
     </View>
   );

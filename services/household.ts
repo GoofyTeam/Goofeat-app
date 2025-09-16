@@ -125,6 +125,16 @@ export async function deleteHousehold(id: string) {
 	return data;
 }
 
+export async function forceDeleteHousehold(id: string) {
+	const { data } = await apiFetch<{ message: string }>(
+		`/households/${id}/force`,
+		{
+			method: 'DELETE',
+		}
+	);
+	return data;
+}
+
 export async function generateInviteCode(id: string) {
 	const { data } = await apiFetch<{ inviteCode: string }>(
 		`/households/${id}/generate-invite-code`,
@@ -146,6 +156,14 @@ export async function joinHousehold(dto: JoinHouseholdDto) {
 		method: 'POST',
 		body: JSON.stringify(dto),
 	});
+	return data;
+}
+
+export async function leaveHousehold(householdId: string) {
+	const { data } = await apiFetch<{ message: string }>(
+		`/households/${householdId}/leave`,
+		{ method: 'POST' }
+	);
 	return data;
 }
 

@@ -1,22 +1,21 @@
 import { Button } from '@/components/ui/button';
 import { TopNav } from '@/components/TopNav';
 import { Text } from '@/components/ui/text';
-import { useAuth } from '@/context/AuthContext';
 import { useHousehold } from '@/context/HouseholdContext';
-import {
-	deleteHousehold,
-	listMembers,
-	removeMember,
-	generateInviteCode,
-} from '@/services/household';
+import { forceDeleteHousehold, generateInviteCode, leaveHousehold, listMembers } from '@/services/household';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, FlatList, TouchableOpacity, View, Platform } from 'react-native';
+import {
+	Alert,
+	FlatList,
+	TouchableOpacity,
+	View,
+	Platform,
+} from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 
 export default function ManageHouseholds() {
 	const router = useRouter();
-	const { user } = useAuth();
 	const {
 		households,
 		currentHouseholdId,
@@ -26,20 +25,21 @@ export default function ManageHouseholds() {
 	const [busy, setBusy] = useState<string | null>(null);
 	const [invitingId, setInvitingId] = useState<string | null>(null);
 
-	const handleLeaveOrDelete = async (householdId: string) => {
+	const handleLeave = async (householdId: string) => {
 		try {
 			setBusy(householdId);
-			const members = await listMembers(householdId);
-			if (members.length <= 1) {
-				await deleteHousehold(householdId);
+			const memberList = await listMembers(householdId);
+			if (memberList.length === 1) {
+				await forceDeleteHousehold(householdId);
 			} else {
-				const myMember = members.find((m) => m.userId === user?.id);
-				if (!myMember) throw new Error('Membre introuvable');
-				await removeMember(householdId, myMember.id);
+				await leaveHousehold(householdId);
 			}
 			await refreshHouseholds();
 		} catch (e: any) {
-			Alert.alert('Action échouée', e?.message || "Impossible d'effectuer l'action");
+			Alert.alert(
+				'Action échouée',
+				e?.message || "Impossible d'effectuer l'action"
+			);
 		} finally {
 			setBusy(null);
 		}
@@ -78,7 +78,10 @@ export default function ManageHouseholds() {
 				);
 			}
 		} catch (e: any) {
-			Alert.alert('Erreur', e?.message || "Impossible de générer un code d'invitation");
+			Alert.alert(
+				'Erreur',
+				e?.message || "Impossible de générer un code d'invitation"
+			);
 		} finally {
 			setInvitingId(null);
 		}
@@ -113,12 +116,16 @@ export default function ManageHouseholds() {
 						<View className="flex-row justify-between items-center">
 							<View className="flex-1">
 								<Text className="text-lg font-semibold">{item.name}</Text>
-								<Text className="text-gray-500 text-sm">{({
-									family: 'Famille',
-									couple: 'Couple',
-									colocation: 'Colocation',
-									single: 'Personne seule',
-								} as Record<string, string>)[item.type] || item.type}</Text>
+								<Text className="text-gray-500 text-sm">
+									{(
+										{
+											family: 'Famille',
+											couple: 'Couple',
+											colocation: 'Colocation',
+											single: 'Personne seule',
+										} as Record<string, string>
+									)[item.type] || item.type}
+								</Text>
 							</View>
 							{currentHouseholdId === item.id ? (
 								<Text className="text-green-600 font-medium">Actif</Text>
@@ -129,11 +136,12 @@ export default function ManageHouseholds() {
 							)}
 						</View>
 
-
 						<View className="flex-row gap-3 mt-3">
 							<Button
 								variant="outline"
-								onPress={() => router.push(`/households/settings?id=${item.id}`)}
+								onPress={() =>
+									router.push(`/households/settings?id=${item.id}`)
+								}
 							>
 								Paramètres
 							</Button>
@@ -149,7 +157,7 @@ export default function ManageHouseholds() {
 							<Button
 								variant="destructive"
 								disabled={busy === item.id}
-								onPress={() => handleLeaveOrDelete(item.id)}
+								onPress={() => handleLeave(item.id)}
 							>
 								Quitter
 							</Button>

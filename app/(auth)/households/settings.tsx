@@ -94,7 +94,7 @@ export default function HouseholdSettingsScreen() {
           ['stockUpdates', 'Mises à jour des stocks'],
           ['childActions', 'Actions des enfants'],
           ['expirationAlerts', 'Alertes de péremption'],
-          ['memberJoined', 'Nouveau membre'],
+          ['memberJoined', 'Nouveau membre dans le foyer'],
           ['onlyParentsForApproval', 'Approbation par les parents uniquement'],
         ] as [keyof typeof notifications, string][]).map(([key, label]) => (
           <View key={key} className="flex-row items-center justify-between py-1">
