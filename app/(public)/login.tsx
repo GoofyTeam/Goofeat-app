@@ -40,8 +40,7 @@ export default function LoginScreen() {
     return (
         <AuthTemplate
             title="Content de vous revoir"
-            description="Connectez-vous avec votre compte Apple ou Google"
-            showSocial
+            description="Connectez-vous avec votre e‑mail et votre mot de passe"
             noticeText={params?.notice === 'verify' ? 'Veuillez vérifier votre e‑mail pour activer votre compte.' : undefined}
         >
             <View className="grid gap-6">
