@@ -1,7 +1,3 @@
-import { API_URL_V1 } from '@/config';
-import * as Linking from 'expo-linking';
-import * as WebBrowser from 'expo-web-browser';
-import { Platform } from 'react-native';
 import { apiFetch, buildQuery } from './api';
 import { clearTokenStorage, getTokenStorage, setTokenStorage } from './storage';
 
@@ -74,38 +70,6 @@ export async function resetPassword(token: string, newPassword: string) {
 
 export function logout() {
 	clearTokenStorage();
-}
-
-// OAuth helpers
-
-export function getOAuthStartUrl(provider: 'google' | 'apple') {
-	return `${API_URL_V1}/auth/${provider}`;
-}
-
-export async function openOAuth(provider: 'google' | 'apple') {
-	const redirectUri = Linking.createURL('/oauth/callback');
-	const startUrl = getOAuthStartUrl(provider);
-
-	// Use WebBrowser auth session across web/native so the window
-	// auto-closes on redirect to our redirectUri.
-	const res = await WebBrowser.openAuthSessionAsync(startUrl, redirectUri);
-	if (res.type === 'success' && res.url) {
-		const url = new URL(res.url);
-		const hash = url.hash?.startsWith('#') ? url.hash.substring(1) : url.hash;
-		const hp = new URLSearchParams(hash || '');
-		const token =
-			hp.get('access_token') ||
-			url.searchParams.get('access_token') ||
-			undefined;
-		if (token) {
-			setTokenStorage(token);
-			// On web, refresh so app state picks up the new token
-			if (Platform.OS === 'web' && typeof window !== 'undefined') {
-				window.location.reload();
-			}
-		}
-	}
-	return res;
 }
 
 // JWT decode (no verify) for exp check

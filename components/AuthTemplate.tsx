@@ -8,14 +8,11 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { AuthSocialButtons } from '@/components/AuthSocialButtons';
 
 type AuthTemplateProps = {
 	title: string;
 	description?: string;
 	children: React.ReactNode;
-	showSocial?: boolean;
 	noticeText?: string;
 	displayDisclaimer?: boolean;
 };
@@ -24,7 +21,6 @@ export function AuthTemplate({
 	title,
 	description,
 	children,
-	showSocial,
 	noticeText,
 	displayDisclaimer,
 }: AuthTemplateProps) {
@@ -48,19 +44,6 @@ export function AuthTemplate({
 					</CardHeader>
 					<CardContent>
 						<View className="flex flex-col gap-6">
-							{showSocial ? (
-								<>
-									<AuthSocialButtons buttonClassName="w-full" />
-									<View className="flex-row items-center gap-3 w-full">
-										<Separator className="flex-1 w-auto shrink bg-gray-300" />
-                            <Text className="text-gray-500 text-sm">
-                                Ou continuer avec
-                            </Text>
-										<Separator className="flex-1 w-auto shrink bg-gray-300" />
-									</View>
-								</>
-							) : null}
-
 							{children}
 						</View>
 					</CardContent>

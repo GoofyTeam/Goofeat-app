@@ -56,8 +56,7 @@ export default function Register() {
     return (
         <AuthTemplate
             title="Créer un compte"
-            description="Inscrivez-vous avec votre compte Apple ou Google"
-            showSocial
+            description="Inscrivez-vous avec votre adresse e‑mail"
             displayDisclaimer
         >
             <View className="grid gap-6">
