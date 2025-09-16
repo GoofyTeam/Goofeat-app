@@ -31,7 +31,7 @@ export default function HouseholdOnboarding() {
   return (
     <View className="flex-1 p-6 gap-6">
       <TopNav />
-      <Text className="text-3xl font-bold">Welcome</Text>
+      <Text className="text-3xl font-bold">Bienvenue</Text>
       <Text className="text-base text-gray-600">
         Rejoinds un foyer existant ou crée un nouveau foyer pour commencer à utiliser Goofeat.
       </Text>

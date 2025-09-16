@@ -43,10 +43,10 @@ export default function CreateHouseholdScreen() {
   return (
     <View className="flex-1 p-6 gap-6">
       <TopNav />
-      <Text className="text-3xl font-bold">Create household</Text>
+      <Text className="text-3xl font-bold">Créer un foyer</Text>
 
       <View className="gap-3">
-        <Label>Name *</Label>
+        <Label>Nom *</Label>
         <Input value={name} onChangeText={setName} placeholder="My home" />
       </View>
 
@@ -71,7 +71,7 @@ export default function CreateHouseholdScreen() {
       </View>
 
       <Button disabled={!canSubmit || loading} onPress={handleCreate}>
-        {loading ? 'Creating...' : 'Create'}
+        {loading ? 'Création...' : 'Créer le foyer'}
       </Button>
     </View>
   );
