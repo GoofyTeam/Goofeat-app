@@ -1,12 +1,12 @@
 import { AuthTemplate } from '@/components/AuthTemplate';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/context/AuthContext';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
-import { Alert, View, Platform } from 'react-native';
+import { Alert, Platform, View } from 'react-native';
 
 export default function LoginScreen() {
 	const router = useRouter();
@@ -46,7 +46,7 @@ export default function LoginScreen() {
             <View className="grid gap-6">
                 <View className="grid gap-3">
                     <Label>E‑mail</Label>
-                    <Input keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={setEmail} placeholder="exemple@domaine.com" />
+                    <Input testID="email" keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={setEmail} placeholder="exemple@domaine.com" />
                     {email.length > 0 && !/[^\s@]+@[^\s@]+\.[^\s@]+/.test(email) ? (
                         <Text className="text-destructive text-xs">Veuillez saisir une adresse e‑mail valide</Text>
                     ) : null}
@@ -58,7 +58,7 @@ export default function LoginScreen() {
                             <Text className="ml-auto text-sm underline-offset-4">Mot de passe oublié ?</Text>
                         </Link>
                     </View>
-                    <Input secureTextEntry autoCapitalize="none" value={password} onChangeText={setPassword} />
+                    <Input testID="password" secureTextEntry autoCapitalize="none" value={password} onChangeText={setPassword} />
                 </View>
                 <Button className="w-full" disabled={loading || !isValid} onPress={handleLogin}>Se connecter</Button>
                 <Text className="text-center text-sm">

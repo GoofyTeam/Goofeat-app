@@ -12,6 +12,8 @@ jobs:
     timeout-minutes: 20
     env:
       CI: true
+      E2E_EMAIL: ${{ secrets.E2E_EMAIL }}
+      E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
 
     steps:
       - name: Checkout
