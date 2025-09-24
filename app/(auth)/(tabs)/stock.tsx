@@ -9,8 +9,53 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { formatDateForDisplay } from '@/lib/date';
 import { UnitLabels } from '@/constants/Units';
+import {
+  Criticality,
+  formatDlcDateForDisplay,
+} from '@/lib/criticality';
+
+const cardColorByCriticality: Record<Criticality, string> = {
+  normal: 'bg-white border-gray-200',
+  warning: 'bg-yellow-50 border-yellow-200',
+  urgent: 'bg-orange-50 border-orange-200',
+  critical: 'bg-red-50 border-red-200',
+  expired: 'bg-gray-200 border-gray-300',
+};
+
+const statusTextColorByCriticality: Record<Criticality, string> = {
+  normal: 'text-gray-500',
+  warning: 'text-yellow-700',
+  urgent: 'text-orange-700',
+  critical: 'text-red-700',
+  expired: 'text-gray-700',
+};
+
+const describeExpiry = (article: Article): string => {
+  const formattedDlc = formatDlcDateForDisplay(article.dlc);
+  const days = article.daysUntilExpiry;
+
+  if (days === null) {
+    return formattedDlc ? `DLC : ${formattedDlc}` : 'DLC non renseignée';
+  }
+
+  const baseLabel = formattedDlc ? `DLC : ${formattedDlc}` : 'DLC';
+
+  if (days < 0) {
+    const absDays = Math.abs(days);
+    return `${baseLabel} (Expiré depuis ${absDays} jour${absDays > 1 ? 's' : ''})`;
+  }
+
+  if (days === 0) {
+    return `${baseLabel} (Expire aujourd'hui)`;
+  }
+
+  if (days === 1) {
+    return `${baseLabel} (Expire dans 1 jour)`;
+  }
+
+  return `${baseLabel} (Expire dans ${days} jours)`;
+};
 
 export default function StockList() {
   const {
@@ -74,31 +119,43 @@ export default function StockList() {
         </View>
       ) : (
         <ScrollView showsVerticalScrollIndicator={false} className='flex-1'>
-          {articles.map((item) => (
-            <View key={item.id} className='mb-3'>
-              <View className='flex-row items-center justify-between bg-white rounded-lg p-4 border border-gray-200'>
-                <View className='flex-row items-center flex-1'>
-                  <View className='flex-1'>
-                    <Text className='font-medium text-base' numberOfLines={1}>
-                      {item.name}
-                    </Text>
-                    <Text className='text-sm text-gray-500 mt-1'>
-                      {item.quantity} {UnitLabels[item.unit]}
-                    </Text>
-                    <Text className='text-sm text-gray-500 mt-1'>
-                      {formatDateForDisplay(new Date(item.dlc))}
-                    </Text>
-                  </View>
-                </View>
-                <TouchableOpacity
-                  onPress={() => handleEditArticle(item)}
-                  className='w-8 h-8 rounded-md items-center justify-center bg-gray-100'
+          {articles.map((item) => {
+            const cardTone =
+              cardColorByCriticality[item.criticality] ||
+              cardColorByCriticality.normal;
+            const statusTone =
+              statusTextColorByCriticality[item.criticality] ||
+              statusTextColorByCriticality.normal;
+            const expiryDescription = describeExpiry(item);
+
+            return (
+              <View key={item.id} className='mb-3'>
+                <View
+                  className={`flex-row items-center justify-between rounded-lg p-4 border ${cardTone}`}
                 >
-                  <Text className='text-gray-500 text-xs'>✏️</Text>
-                </TouchableOpacity>
+                  <View className='flex-row items-center flex-1'>
+                    <View className='flex-1'>
+                      <Text className='font-medium text-base' numberOfLines={1}>
+                        {item.name}
+                      </Text>
+                      <Text className='text-sm text-gray-500 mt-1'>
+                        {item.quantity} {UnitLabels[item.unit]}
+                      </Text>
+                      <Text className={`text-sm mt-1 ${statusTone}`}>
+                        {expiryDescription}
+                      </Text>
+                    </View>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => handleEditArticle(item)}
+                    className='w-8 h-8 rounded-md items-center justify-center bg-gray-100'
+                  >
+                    <Text className='text-gray-500 text-xs'>✏️</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-          ))}
+            );
+          })}
         </ScrollView>
       )}
       <EditArticleModal
