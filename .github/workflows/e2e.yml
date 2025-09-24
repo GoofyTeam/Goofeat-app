@@ -28,7 +28,8 @@ jobs:
 
       # Installs Playwright browsers & required OS deps
       - name: Install Playwright
-        run: npx playwright install --with-deps
+        run: npx i -D @playwright/test
+             npx playwright install --with-deps
 
       # Run tests (webServer from playwright.config.ts will start your app)
       - name: Run Playwright tests
