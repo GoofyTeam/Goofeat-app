@@ -3,40 +3,38 @@ import { TopNav } from '@/components/TopNav';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Text } from '@/components/ui/text';
-import { useHousehold } from '@/context/HouseholdContext';
-import { createHousehold, HouseholdType } from '@/services/household';
+import { HOUSEHOLD_TYPE_OPTIONS, useCreateHouseholdForm } from '@/hooks/useHouseholdActions';
 import { useRouter } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Alert, View } from 'react-native';
-
-const TYPES: { label: string; value: HouseholdType }[] = [
-  { label: 'Family', value: 'family' },
-  { label: 'Couple', value: 'couple' },
-  { label: 'Colocation', value: 'colocation' },
-  { label: 'Single', value: 'single' },
-];
 
 export default function CreateHouseholdScreen() {
   const router = useRouter();
-  const { refreshHouseholds, setCurrentHousehold } = useHousehold();
-  const [name, setName] = useState('');
-  const [type, setType] = useState<HouseholdType>('single');
-  const [description, setDescription] = useState('');
-  const [loading, setLoading] = useState(false);
+  const {
+    state,
+    submitting,
+    canSubmit,
+    error,
+    setName,
+    setType,
+    setDescription,
+    submit,
+    clearError,
+  } = useCreateHouseholdForm();
 
-  const canSubmit = useMemo(() => name.trim().length > 0, [name]);
+  useEffect(() => {
+    if (!error) return;
+    Alert.alert('Création échouée', error, [{ text: 'OK', onPress: clearError }]);
+  }, [clearError, error]);
 
   const handleCreate = async () => {
     try {
-      setLoading(true);
-      const h = await createHousehold({ name: name.trim(), type, description: description.trim() || undefined });
-      await refreshHouseholds();
-      await setCurrentHousehold(h.id);
-      router.replace('/');
-    } catch (e: any) {
-      Alert.alert('Création échoué', e?.message || 'Il y a eu un problème lors de la création du foyer');
-    } finally {
-      setLoading(false);
+      const created = await submit();
+      if (created) {
+        router.replace('/');
+      }
+    } catch {
+      // L'erreur est gérée via le state et l'effet ci-dessus
     }
   };
 
@@ -47,16 +45,16 @@ export default function CreateHouseholdScreen() {
 
       <View className="gap-3">
         <Label>Nom *</Label>
-        <Input value={name} onChangeText={setName} placeholder="My home" />
+        <Input value={state.name} onChangeText={setName} placeholder="My home" />
       </View>
 
       <View className="gap-3">
         <Label>Type</Label>
         <View className="flex-row flex-wrap gap-2">
-          {TYPES.map((t) => (
+          {HOUSEHOLD_TYPE_OPTIONS.map((t) => (
             <Button
               key={t.value}
-              variant={type === t.value ? 'default' : 'outline'}
+              variant={state.type === t.value ? 'default' : 'outline'}
               onPress={() => setType(t.value)}
             >
               {t.label}
@@ -67,11 +65,11 @@ export default function CreateHouseholdScreen() {
 
       <View className="gap-3">
         <Label>Description</Label>
-        <Input value={description} onChangeText={setDescription} placeholder="Optional" />
+        <Input value={state.description} onChangeText={setDescription} placeholder="Optional" />
       </View>
 
-      <Button disabled={!canSubmit || loading} onPress={handleCreate}>
-        {loading ? 'Création...' : 'Créer le foyer'}
+      <Button disabled={!canSubmit || submitting} onPress={handleCreate}>
+        {submitting ? 'Création...' : 'Créer le foyer'}
       </Button>
     </View>
   );

@@ -3,28 +3,34 @@ import { TopNav } from '@/components/TopNav';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Text } from '@/components/ui/text';
-import { useHousehold } from '@/context/HouseholdContext';
-import { joinHousehold } from '@/services/household';
+import { useJoinHouseholdForm } from '@/hooks/useHouseholdActions';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { Alert, View } from 'react-native';
 
 export default function HouseholdOnboarding() {
   const router = useRouter();
-  const { refreshHouseholds } = useHousehold();
-  const [inviteCode, setInviteCode] = useState('');
-  const [joining, setJoining] = useState(false);
+  const {
+    state,
+    submitting,
+    canSubmit,
+    error,
+    setCode,
+    submit,
+    clearError,
+  } = useJoinHouseholdForm();
+
+  useEffect(() => {
+    if (!error) return;
+    Alert.alert('Erreur', error, [{ text: 'OK', onPress: clearError }]);
+  }, [clearError, error]);
 
   const handleJoin = async () => {
     try {
-      setJoining(true);
-      await joinHousehold({ inviteCode: inviteCode.trim() });
-      await refreshHouseholds();
+      await submit();
       router.replace('/');
-    } catch (e: any) {
-      Alert.alert('Errur', e?.message || 'Impossible de rejoindre le foyer');
-    } finally {
-      setJoining(false);
+    } catch {
+      // L'erreur est gérée via l'effet ci-dessus
     }
   };
 
@@ -37,9 +43,11 @@ export default function HouseholdOnboarding() {
       </Text>
 
       <View className="gap-3">
-        <Label>Code d&apos;invation</Label>
-        <Input value={inviteCode} onChangeText={setInviteCode} placeholder="ABC123" autoCapitalize="characters" />
-        <Button disabled={!inviteCode || joining} onPress={handleJoin}>Rejoindre le foyer</Button>
+        <Label>Code d&apos;invitation</Label>
+        <Input value={state.code} onChangeText={setCode} placeholder="ABC123" autoCapitalize="characters" />
+        <Button disabled={!canSubmit || submitting} onPress={handleJoin}>
+          {submitting ? 'Adhésion...' : 'Rejoindre le foyer'}
+        </Button>
       </View>
 
       <View className="items-center">

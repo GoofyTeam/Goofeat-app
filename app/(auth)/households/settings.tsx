@@ -4,10 +4,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Text } from '@/components/ui/text';
 import { useHousehold } from '@/context/HouseholdContext';
-import { getHouseholdSettings, updateHouseholdSettings } from '@/services/household';
+import { useHouseholdSettingsController } from '@/hooks/useHouseholdActions';
 import { Switch } from '@/components/ui/switch';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Alert, View } from 'react-native';
 
 export default function HouseholdSettingsScreen() {
@@ -16,61 +16,30 @@ export default function HouseholdSettingsScreen() {
   const paramId = Array.isArray(params?.id) ? params.id[0] : (params?.id as string | undefined);
   const selectedHouseholdId = paramId || currentHousehold?.id;
   const selectedHousehold = households.find((h) => h.id === selectedHouseholdId) || currentHousehold;
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [notifications, setNotifications] = useState({
-    stockUpdates: true,
-    childActions: true,
-    expirationAlerts: true,
-    memberJoined: true,
-    onlyParentsForApproval: true,
-    digestMode: 'instant' as 'instant' | 'daily' | 'weekly' | 'disabled',
-  });
-  const [childApproval, setChildApproval] = useState({
-    enabled: true,
-    autoExpireHours: 24,
-    maxQuantityWithoutApproval: 1,
-  });
+  const {
+    loading,
+    saving,
+    canSave,
+    error,
+    notifications,
+    childApproval,
+    setNotification,
+    setChildApprovalValue,
+    save,
+    clearError,
+  } = useHouseholdSettingsController(selectedHouseholdId);
 
   useEffect(() => {
-    (async () => {
-      if (!selectedHouseholdId) return;
-      setLoading(true);
-      try {
-        const s = await getHouseholdSettings(selectedHouseholdId);
-        setNotifications({
-          stockUpdates: s.notifications?.stockUpdates ?? true,
-          childActions: s.notifications?.childActions ?? true,
-          expirationAlerts: s.notifications?.expirationAlerts ?? true,
-          memberJoined: s.notifications?.memberJoined ?? true,
-          onlyParentsForApproval: s.notifications?.onlyParentsForApproval ?? true,
-          digestMode: s.notifications?.digestMode ?? 'instant',
-        });
-        setChildApproval({
-          enabled: s.childApproval?.enabled ?? true,
-          autoExpireHours: s.childApproval?.autoExpireHours ?? 24,
-          maxQuantityWithoutApproval: s.childApproval?.maxQuantityWithoutApproval ?? 1,
-        });
-      } catch (e) {
-        console.error(e);
-        Alert.alert('Erreur', 'Impossible de charger les paramètres');
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [currentHousehold, currentHousehold?.id, selectedHouseholdId]);
-
-  const canSave = useMemo(() => !!selectedHouseholdId, [selectedHouseholdId]);
+    if (!error) return;
+    Alert.alert('Erreur', error, [{ text: 'OK', onPress: clearError }]);
+  }, [clearError, error]);
 
   const handleSave = async () => {
-    if (!selectedHouseholdId) return;
     try {
-      setSaving(true);
-      await updateHouseholdSettings(selectedHouseholdId, { notifications, childApproval });
+      await save();
     } catch (e: any) {
       Alert.alert('Échec de l\'enregistrement', e?.message || 'Impossible d\'enregistrer');
-    } finally {
-      setSaving(false);
+      clearError();
     }
   };
 
@@ -102,7 +71,7 @@ export default function HouseholdSettingsScreen() {
             <Switch
               checked={!!notifications[key]}
               onCheckedChange={(checked) =>
-                setNotifications((prev) => ({ ...prev, [key]: !!checked }))
+                setNotification(key, !!checked)
               }
             />
           </View>
@@ -115,7 +84,7 @@ export default function HouseholdSettingsScreen() {
               <Button
                 key={m}
                 variant={notifications.digestMode === m ? 'default' : 'outline'}
-                onPress={() => setNotifications((prev) => ({ ...prev, digestMode: m }))}
+                onPress={() => setNotification('digestMode', m)}
               >
                 {m === 'instant' ? 'instantané' : m === 'daily' ? 'quotidien' : m === 'weekly' ? 'hebdomadaire' : 'désactivé'}
               </Button>
@@ -132,7 +101,7 @@ export default function HouseholdSettingsScreen() {
           <Switch
             checked={!!childApproval.enabled}
             onCheckedChange={(checked) =>
-              setChildApproval((prev) => ({ ...prev, enabled: !!checked }))
+              setChildApprovalValue('enabled', !!checked)
             }
           />
         </View>
@@ -141,7 +110,12 @@ export default function HouseholdSettingsScreen() {
           <Input
             keyboardType="numeric"
             value={String(childApproval.autoExpireHours)}
-            onChangeText={(v) => setChildApproval((prev) => ({ ...prev, autoExpireHours: Math.max(0, parseInt(v || '0', 10) || 0) }))}
+            onChangeText={(v) =>
+              setChildApprovalValue(
+                'autoExpireHours',
+                Math.max(0, parseInt(v || '0', 10) || 0)
+              )
+            }
             editable={!!childApproval.enabled}
           />
         </View>
@@ -150,7 +124,12 @@ export default function HouseholdSettingsScreen() {
           <Input
             keyboardType="numeric"
             value={String(childApproval.maxQuantityWithoutApproval)}
-            onChangeText={(v) => setChildApproval((prev) => ({ ...prev, maxQuantityWithoutApproval: Math.max(0, parseInt(v || '0', 10) || 0) }))}
+            onChangeText={(v) =>
+              setChildApprovalValue(
+                'maxQuantityWithoutApproval',
+                Math.max(0, parseInt(v || '0', 10) || 0)
+              )
+            }
             editable={!!childApproval.enabled}
           />
         </View>
