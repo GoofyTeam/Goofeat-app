@@ -75,7 +75,7 @@ export default function AccountScreen() {
 						Informations personnelles
 					</Text>
 
-					<View className="gap-3">
+					<View>
 						<Label>Prénom *</Label>
 						<Input
 							value={firstName}
@@ -84,7 +84,7 @@ export default function AccountScreen() {
 						/>
 					</View>
 
-					<View className="gap-3">
+					<View>
 						<Label>Nom *</Label>
 						<Input
 							value={lastName}
@@ -93,7 +93,7 @@ export default function AccountScreen() {
 						/>
 					</View>
 
-					<View className="gap-3">
+					<View>
 						<Label>Email *</Label>
 						<Input
 							value={email}
@@ -182,7 +182,7 @@ export default function AccountScreen() {
 								Changer de mot de passe
 							</Text>
 
-							<View className="gap-3">
+							<View>
 								<Label>Mot de passe actuel *</Label>
 								<Input
 									value={currentPassword}
@@ -192,7 +192,7 @@ export default function AccountScreen() {
 								/>
 							</View>
 
-							<View className="gap-3">
+							<View>
 								<Label>Nouveau mot de passe *</Label>
 								<Input
 									value={newPassword}
@@ -202,7 +202,7 @@ export default function AccountScreen() {
 								/>
 							</View>
 
-							<View className="gap-3">
+							<View>
 								<Label>Confirmer le nouveau mot de passe *</Label>
 								<Input
 									value={confirmPassword}

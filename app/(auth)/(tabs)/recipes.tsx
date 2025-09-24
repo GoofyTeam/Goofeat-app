@@ -1,5 +1,5 @@
 import { TopNav } from '@/components/TopNav';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import {
@@ -19,14 +19,14 @@ export default function RecipesTab() {
   const [limit] = useState(10);
   const [total, setTotal] = useState<number | undefined>(undefined);
   const [search, setSearch] = useState('');
-  const [showMakeable, setShowMakeable] = useState(false);
+  const [showMakeable, setShowMakeable] = useState(true);
 
   const canLoadMore = useMemo(() => {
     if (!total) return true; // unknown
     return recipes.length < total;
   }, [recipes.length, total]);
 
-  async function loadInitial() {
+  const loadInitial = useCallback(async () => {
     try {
       if (showMakeable) {
         const res = await getMakeableRecipes();
@@ -45,7 +45,7 @@ export default function RecipesTab() {
     } catch (e) {
       console.error(e);
     }
-  }
+  }, [showMakeable, search, limit]);
 
   async function loadMore() {
     if (loading || showMakeable || search.trim().length > 0) return; // Only paginated on default list
@@ -63,8 +63,7 @@ export default function RecipesTab() {
 
   useEffect(() => {
     loadInitial();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showMakeable]);
+  }, [loadInitial, showMakeable]);
 
   return (
     <View className='flex-1 p-6'>

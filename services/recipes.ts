@@ -125,7 +125,7 @@ export async function getMakeableRecipes(): Promise<
 	{ data: RecipeDto[] } & Partial<PaginatedRecipesResponse>
 > {
 	const { data } = await apiFetch<any>(`/recipes/makeable`, { method: 'GET' });
-	if (Array.isArray(data?.data)) return data;
+	if (Array.isArray(data?.results)) return { data: data.results };
 	if (Array.isArray(data?.recipes)) return { data: data.recipes };
 	return { data: [] };
 }
