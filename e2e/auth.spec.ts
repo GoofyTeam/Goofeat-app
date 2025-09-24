@@ -1,47 +1,44 @@
 // e2e/auth.spec.ts
 import { expect, test } from "@playwright/test";
 
-const BASE_URL = 'http://localhost:5173';
-const EMAIL = process.env.E2E_EMAIL ?? '';
-const PASSWORD = process.env.E2E_PASSWORD ?? '';
+const BASE_URL = "http://localhost:5173";
+const EMAIL = process.env.E2E_EMAIL ?? "";
+const PASSWORD = process.env.E2E_PASSWORD ?? "";
 
 test.describe("Auth / Login", () => {
-  test("redirects from / to /login", async ({ page }) => {
+  test("redirects from / to /login", async ({ page }: any) => {
     await page.goto(`${BASE_URL}/`);
     await expect(page).toHaveURL(/\/login$/);
 
-    // Title from your AuthTemplate
     await expect(
       page.getByRole("heading", { name: /Content de vous revoir/i })
     ).toBeVisible();
   });
 
-  test("shows verify notice when notice=verify", async ({ page }) => {
+  test("shows verify notice when notice=verify", async ({ page }: any) => {
     await page.goto(`${BASE_URL}/login?notice=verify`);
     await expect(
       page.getByText(/Veuillez vérifier votre e.?mail/i)
     ).toBeVisible();
   });
 
-  test("logs in with provided credentials and lands on /", async ({ page }) => {
+  test("logs in with provided credentials and lands on /", async ({ page }: any) => {
     // Handle possible window.alert() on login failure so test doesn't hang
     let sawErrorDialog = false;
-    page.on("dialog", async (dialog) => {
+    page.on("dialog", async (dialog: any) => {
       sawErrorDialog = true;
       await dialog.accept();
     });
 
     await page.goto(`${BASE_URL}/login`);
 
-    // Fill email & password (tolerate NBSP / hyphen in labels/placeholder)
+    // Fill email & password
     await page.getByTestId("email").fill(EMAIL);
     await page.getByTestId("password").fill(PASSWORD);
 
     // Click submit
     await page.getByRole("button", { name: /Se connecter/i }).click();
 
-    // Your login() does router.replace('/'); wait for navigation or error dialog
-    // First, try to confirm success:
     const navigated = await Promise.race([
       page
         .waitForURL(`${BASE_URL}/`, { timeout: 10_000 })

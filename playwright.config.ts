@@ -2,7 +2,6 @@ import { defineConfig } from '@playwright/test';
 import * as dotenv from 'dotenv';
 
 dotenv.config({ path: '.env.e2e.local' });
-dotenv.config(); // optional fallback
 
 export default defineConfig({
   timeout: 30_000,
