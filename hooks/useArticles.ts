@@ -3,6 +3,11 @@ import { useAuth } from '@/context/AuthContext';
 import { useHousehold } from '@/context/HouseholdContext';
 import { useIngredientContext } from '@/context/IngredientContext';
 import { getStocks } from '@/services/stock';
+import {
+	Criticality,
+	computeDaysUntilExpiry,
+	resolveCriticality,
+} from '@/lib/criticality';
 import { useCallback, useEffect, useState } from 'react';
 
 export interface Article {
@@ -11,7 +16,17 @@ export interface Article {
 	quantity: number;
 	unit: UnitType;
 	dlc: string;
+	daysUntilExpiry: number | null;
+	criticality: Criticality;
 }
+
+const sortArticlesByExpiry = <T extends Article>(items: T[]): T[] => {
+	return [...items].sort((a, b) => {
+		const aValue = a.daysUntilExpiry ?? Number.POSITIVE_INFINITY;
+		const bValue = b.daysUntilExpiry ?? Number.POSITIVE_INFINITY;
+		return aValue - bValue;
+	});
+};
 
 export function useArticles() {
 	const { ingredients } = useIngredientContext();
@@ -34,16 +49,23 @@ export function useArticles() {
 
 			setTotalStocks(stocksResponse.total);
 
-			const articlesFromStocks = stocksResponse.data.map((stock) => ({
-				id: stock.id,
-				name: stock.product.name,
-				quantity: stock.quantity,
-				unit: (stock.unit as UnitType) || PieceUnit.UNIT,
-				dlc: stock.dlc || '',
-			}));
+			const articlesFromStocks = stocksResponse.data.map((stock) => {
+				const dlc = stock.dlc || '';
+				const daysUntilExpiry = computeDaysUntilExpiry(dlc);
+				return {
+					id: stock.id,
+					name: stock.product.name,
+					quantity: stock.quantity,
+					unit: (stock.unit as UnitType) || PieceUnit.UNIT,
+					dlc,
+					daysUntilExpiry,
+					criticality: resolveCriticality(daysUntilExpiry),
+				};
+			});
 
-			setAllArticles(articlesFromStocks);
-			setFilteredArticles(articlesFromStocks);
+			const sortedArticles = sortArticlesByExpiry(articlesFromStocks);
+			setAllArticles(sortedArticles);
+			setFilteredArticles(sortedArticles);
 		} catch (error) {
 			console.error('Erreur lors du chargement des stocks:', error);
 
@@ -53,9 +75,12 @@ export function useArticles() {
 				quantity: item.occurrences,
 				unit: PieceUnit.UNIT,
 				dlc: '',
+				daysUntilExpiry: null,
+				criticality: 'normal' as const,
 			}));
-			setAllArticles(articlesFromIngredients);
-			setFilteredArticles(articlesFromIngredients);
+			const sortedFallback = sortArticlesByExpiry(articlesFromIngredients);
+			setAllArticles(sortedFallback);
+			setFilteredArticles(sortedFallback);
 		} finally {
 			setLoading(false);
 		}
@@ -72,8 +97,9 @@ export function useArticles() {
 				return;
 			}
 
+			const lowerCaseSearch = searchText.toLowerCase();
 			const filtered = allArticles.filter((article) =>
-				article.name.toLowerCase().includes(searchText.toLowerCase())
+				article.name.toLowerCase().includes(lowerCaseSearch)
 			);
 			setFilteredArticles(filtered);
 		},
@@ -109,7 +135,12 @@ export function useArticles() {
 	};
 
 	const setDlc = (articleId: string, value: string) => {
-		updateArticle(articleId, { dlc: value });
+		const daysUntilExpiry = computeDaysUntilExpiry(value);
+		updateArticle(articleId, {
+			dlc: value,
+			daysUntilExpiry,
+			criticality: resolveCriticality(daysUntilExpiry),
+		});
 	};
 
 	const setUnit = (articleId: string, unit: UnitType) => {

@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { getRecipe, RecipeDto, validateRecipe } from '@/services/recipes';
@@ -6,7 +6,6 @@ import { TopNav } from '@/components/TopNav';
 
 export default function RecipeSteps() {
   const { id, servings: servingsParam } = useLocalSearchParams<{ id: string; servings?: string }>();
-  const router = useRouter();
 
   const [recipe, setRecipe] = useState<RecipeDto | null>(null);
   const [loading, setLoading] = useState(true);
@@ -145,7 +144,7 @@ export default function RecipeSteps() {
             >
               <Text>Précédent</Text>
             </TouchableOpacity>
-            {stepIndex < steps.length - 1 ? (
+            {(stepIndex && stepIndex < steps.length - 1) ? (
               <TouchableOpacity
                 onPress={() => setStepIndex((i) => Math.min(steps.length - 1, i + 1))}
                 className='bg-black px-4 py-3 rounded-md'
@@ -164,12 +163,6 @@ export default function RecipeSteps() {
           </View>
         </View>
       )}
-
-      <View className='mt-3'>
-        <TouchableOpacity onPress={() => router.back()} className='px-2 py-2'>
-          <Text className='text-gray-600'>Retour</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
