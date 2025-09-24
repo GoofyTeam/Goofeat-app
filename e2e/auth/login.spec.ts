@@ -1,4 +1,3 @@
-// e2e/auth.spec.ts
 import { expect, test } from "@playwright/test";
 
 const BASE_URL = "http://localhost:5173";
@@ -6,23 +5,9 @@ const EMAIL = process.env.E2E_EMAIL ?? "";
 const PASSWORD = process.env.E2E_PASSWORD ?? "";
 
 test.describe("Auth / Login", () => {
-  test("redirects from / to /login", async ({ page }: any) => {
-    await page.goto(`${BASE_URL}/`);
-    await expect(page).toHaveURL(/\/login$/);
-
-    await expect(
-      page.getByRole("heading", { name: /Content de vous revoir/i })
-    ).toBeVisible();
-  });
-
-  test("shows verify notice when notice=verify", async ({ page }: any) => {
-    await page.goto(`${BASE_URL}/login?notice=verify`);
-    await expect(
-      page.getByText(/Veuillez vérifier votre e.?mail/i)
-    ).toBeVisible();
-  });
-
-  test("logs in with provided credentials and lands on /", async ({ page }: any) => {
+  test("logs in with provided credentials and lands on /", async ({
+    page,
+  }: any) => {
     // Handle possible window.alert() on login failure so test doesn't hang
     let sawErrorDialog = false;
     page.on("dialog", async (dialog: any) => {
